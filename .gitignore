@@ -30,3 +30,4 @@ testing/timing.stats*
 .project
 testing/tests/binding/diffs
 testing/tests/binding/results
+*.swp
