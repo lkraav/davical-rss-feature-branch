@@ -22,25 +22,6 @@ function caldav_get_rss( $request ) {
 	  $request->DoResponse( 404, translate("Resource Not Found.") );
 	}
 
-	function obfuscated_event( $icalendar ) {
-	  // The user is not admin / owner of this calendar looking at his calendar and can not admin the other cal,
-	  // or maybe they don't have *read* access but they got here, so they must at least have free/busy access
-	  // so we will present an obfuscated version of the event that just says "Busy" (translated :-)
-	  $confidential = new iCalComponent();
-	  $confidential->SetType($icalendar->GetType());
-	  $confidential->AddProperty( 'SUMMARY', translate('Busy') );
-	  $confidential->AddProperty( 'CLASS', 'CONFIDENTIAL' );
-	  $confidential->SetProperties( $icalendar->GetProperties('DTSTART'), 'DTSTART' );
-	  $confidential->SetProperties( $icalendar->GetProperties('RRULE'), 'RRULE' );
-	  $confidential->SetProperties( $icalendar->GetProperties('DURATION'), 'DURATION' );
-	  $confidential->SetProperties( $icalendar->GetProperties('DTEND'), 'DTEND' );
-	  $confidential->SetProperties( $icalendar->GetProperties('UID'), 'UID' );
-	  $confidential->SetProperties( $icalendar->GetProperties('CREATED'), 'CREATED' );
-
-	  return $confidential;
-	}
-
-
 	if ( $dav_resource->IsCollection() ) {
 	  if ( ! $dav_resource->IsCalendar() && !(isset($c->get_includes_subcollections) && $c->get_includes_subcollections) ) {
 		/** RFC2616 says we must send an Allow header if we send a 405 */
