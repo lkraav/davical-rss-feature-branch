@@ -4,7 +4,7 @@
 #
 TYPE=PROPFIND
 URL=http://mycaldav/caldav.php/user1/home
-HEAD
+# HEAD
 
 HEADER=User-Agent: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.0.7) Gecko/20061013 Thunderbird/1.5.0.7
 HEADER=Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5

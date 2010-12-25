@@ -1,3 +1,98 @@
+2010-12-25  Andrew McMillan  <andrew@morphoss.com>
+	* Release 0.9.9.4
+	* Remove all reference to PgQuery
+	* Extensive refactoring of principal-edit, plus support for creating tickets.
+	* Add support for writing scheduling resources on PUT.
+	* Improve support for handling floating time.
+	* Add cil for internal issue tracking.
+
+2010-12-08  Andrew McMillan  <andrew@morphoss.com>
+	* Cut access with invalid/expired tickets out immediately.
+
+2010-12-07  Andrew McMillan  <andrew@morphoss.com>
+	* Handle empty PROPFIND, don't blow up on invalid XML.
+
+2010-11-30  Andrew McMillan  <andrew@morphoss.com>
+	* /.well-known/* now returns a 301 redirect, per spec.
+	* Use text/vcard for content type in advance of ratification of spec.
+	* Properly handle addressbooks in multiget.
+	* Hide authorization headers in logging.
+	* Update sync-collection REPORT to match -04 of draft.
+	* Replace index.php with caldav.php when we find it in our path.
+
+2010-11-27  Andrew McMillan  <andrew@morphoss.com>
+	* Be pedantic about checking user is active before we let them in.
+	* Specify the SRV record examples with leading _ as they should be.
+
+2010-11-21  Andrew McMillan  <andrew@morphoss.com>
+	* Fix SQL for group handling from Michael Braun.
+	* Add principal-collection-set to standard responses for DAVResource.
+	* Correct typo in POST handling.
+
+2010-11-20  Andrew McMillan  <andrew@morphoss.com>
+	* Also update displayname if fullname is changed.
+
+2010-10-02  Daniel Aleksandersen  <daniel@>
+	* remove old screenshots
+	* updated iPhone client configuration with new screenshots
+
+2010-11-19  Andrew McMillan  <andrew@morphoss.com>
+	* Handle stuff like DTSTART;TZID=America/New_York:20101119T231307
+
+2010-11-14  Andrew McMillan  <andrew@morphoss.com>
+	* Script to refresh calendar_alarms with next instance time.
+
+2010-11-09  Andrew McMillan  <andrew@morphoss.com>
+	* Don't let auth functions create duplicate home calendars.
+
+2010-11-06  Andrew McMillan  <andrew@morphoss.com>
+	* Patch for caldav sync from Pierre-Arnaud Poudret.
+	* Add ACL to the supported methods.
+	* Change regression runner to look for sample data with tests.
+	* Correct version number typo.
+	* Always grant 'DAV::read' privilege from principal to group members.
+
+2010-11-05  Andrew McMillan  <andrew@morphoss.com>
+	* Use expanded time specifiers in format since %Y doesn't work on Windows.
+	* Support recursive REPORT query if configured to allow it.
+
+2010-11-04  Andrew McMillan  <andrew@morphoss.com>
+	* Add a new WritableCollection object which we will use for PUT.
+	* Use text/vcard rather than older text/x-vcard.
+	* Support event properties in changed part of sync-response.
+	* Rename variable to work around Pg 9.0 reserved name.
+
+2010-11-01  Andrew McMillan  <andrew@morphoss.com>
+	* Switch from regular expression which may not work in old/odd PHP.
+
+2010-10-31  Andrew McMillan  <andrew@morphoss.com>
+	* Support getlastmodified property in REPORT requests.
+
+2010-10-16  Andrew McMillan  <andrew@morphoss.com>
+	* Fix typo in iTIP CANCEL handling.
+
+2010-10-15  Andrew McMillan  <andrew@morphoss.com>
+	* Turn on calendar-auto-schedule header if $c->enable_auto_schedule
+	* Add various additional checks into /setup.php
+	* Add knowledge of desired parallel AWL version to setup.
+
+2010-10-10  Andrew McMillan  <andrew@morphoss.com>
+	* Fix various minor CardDAV bugs.
+	* Omit the <response> for event outside the time range - when expanded.
+	* Fix privilege_to_bits function to set 'all' correctly & work with recent postgres
+
+2010-10-08  Andrew McMillan  <andrew@morphoss.com>
+	* Don't supply freebusy for 0-duration events.
+	* Another regression test for free/busy catching many events.
+	* Add an event with a thoroughly bogus tzid to ensure we cope.
+	* Check for some supported stuff very early so we can show it is missing.
+	* Better display of bindings.
+	* Add postgreSQL 9.0 as a possibility.
+	* Fix warning when using basic authentication fallback.
+	* Fix handling of iCalendar durations containing negative elements.
+	* Handle events which don't have either DTEND *or* DURATION.
+	* Rewrite __construct() method of RepeatRuleDateTimeZone to be more robust.
+
 2010-09-25  Andrew McMillan  <andrew@morphoss.com>
 	* Release 0.9.9.3
 	* Rename 'Import Calendars' to 'Tools' since LDAP is more likely.

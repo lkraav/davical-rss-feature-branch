@@ -80,19 +80,41 @@ class RepeatRuleTimeZone extends DateTimeZone {
 class RepeatRuleDateTime extends DateTime {
   // public static $Format = 'Y-m-d H:i:s';
   public static $Format = 'c';
+  private static $UTCzone;
   private $tzid;
   private $is_date;
 
   public function __construct($date = null, $dtz = null) {
+    if ( !isset(RepeatRuleDateTime::$UTCzone) ) RepeatRuleDateTime::$UTCzone = new RepeatRuleTimeZone('UTC');
     $this->is_date = false;
     if ( !isset($date) ) return;
 
-    if ( preg_match('{;?VALUE=DATE[:;]}', $date, $matches) ) $this->is_date = true;
-    elseif ( preg_match('{:([12]\d{3}) (0[1-9]|1[012]) (0[1-9]|[12]\d|3[01]Z?) $}x', $date, $matches) ) $this->is_date = true;
-    if (preg_match('/;?TZID=([^:]+).*:(\d{8}(T\d{6})?)(Z)?/', $date, $matches) ) {
+    if ( is_object($date) && (gettype($date) == 'vProperty' || gettype($date) == 'iCalProp' ) ) {
+      $tzid = $date->GetProperty('TZID');
+      $actual_date = $date->Value();
+      if ( isset($tzid) ) {
+        $dtz = new RepeatRuleTimeZone($tzid);
+        $this->tzid = $dtz->tzid();
+      }
+      else {
+        $dtz = RepeatRuleDateTime::$UTCzone;
+        if ( substr($actual_date,strlen($actual_date),1) == 'Z' ) {
+          $this->tzid = 'UTC';
+          $actual_date = substr($actual_date, 0, strlen($actual_date) - 1);          
+        }
+      }
+      if ( strlen($actual_date) == 8 ) {
+        // We allow dates without VALUE=DATE parameter, but we don't create them like that
+        $this->is_date;
+      }
+      $date = $actual_date;
+//      printf( "Date%s value with timezone: %s in %s\n", ($this->is_date?"":"Time"), $date, $this->tzid );
+    }
+    elseif (preg_match('/;?(?:TZID=([^:;]+).*):(\d{8}(T\d{6})?)(Z)?/', $date, $matches) ) {
       $date = $matches[2];
+      $this->is_date = (strlen($date) == 8);
       if ( isset($matches[4]) && $matches[4] == 'Z' ) {
-        $dtz = new RepeatRuleTimeZone('UTC');
+        $dtz = RepeatRuleDateTime::$UTCzone;
         $this->tzid = 'UTC';
       }
       else if ( isset($matches[1]) && $matches[1] != '' ) {
@@ -100,19 +122,28 @@ class RepeatRuleDateTime extends DateTime {
         $this->tzid = $dtz->tzid();
       }
       else {
-        $dtz = new RepeatRuleTimeZone('UTC');
+        $dtz = RepeatRuleDateTime::$UTCzone;
         $this->tzid = null;
       }
+//      printf( "Date%s value with timezone: %s in %s\n", ($this->is_date?"":"Time"), $date, $this->tzid );
     }
-    elseif( $dtz === null || $dtz == '' ) {
-      $dtz = new RepeatRuleTimeZone('UTC');
-      if ( preg_match('/(\d{8}(T\d{6})?)Z/', $date, $matches) ) {
-        if ( strlen($matches[1]) == 8 ) $this->is_date = true;
-        $this->tzid = 'UTC';
+    elseif ( ( $dtz === null || $dtz == '' )
+             && preg_match('{;?VALUE=DATE (?:;[^:]+) : ((?:[12]\d{3}) (?:0[1-9]|1[012]) (?:0[1-9]|[12]\d|3[01]Z?) )$}x', $date, $matches) ) {
+      $this->is_date = true;
+      $date = $matches[1];
+      // Floating
+      $dtz = RepeatRuleDateTime::$UTCzone;
+      $this->tzid = null;
+//      printf( "Date value: %s\n", $date );
+    } 
+    elseif ( $dtz === null || $dtz == '' ) {
+      $dtz = RepeatRuleDateTime::$UTCzone;
+      if ( preg_match('/(\d{8}(T\d{6})?)(Z?)/', $date, $matches) ) {
+        $date = $matches[1];
+        $this->tzid = ( $matches[3] == 'Z' ? 'UTC' : null );
       }
-      else {
-        $this->tzid = null;
-      }
+      $this->is_date = (strlen($date) == 8 );
+//      printf( "Date%s value with timezone: %s in %s\n", ($this->is_date?"":"Time"), $date, $this->tzid );
     }
     elseif ( is_string($dtz) ) {
       $dtz = new RepeatRuleTimeZone($dtz);
@@ -138,7 +169,17 @@ class RepeatRuleDateTime extends DateTime {
   }
 
 
+  public function isFloating() {
+    return !isset($this->tzid);
+  }
+
+  public function isDate() {
+    return !isset($this->is_date);
+  }
+
+  
   public function modify( $interval ) {
+//    print ">>$interval<<\n";
     if ( preg_match('{^(-)?P(([0-9-]+)W)?(([0-9-]+)D)?T?(([0-9-]+)H)?(([0-9-]+)M)?(([0-9-]+)S)?$}', $interval, $matches) ) {
       $minus = $matches[1];
       $interval = '';
@@ -165,6 +206,20 @@ class RepeatRuleDateTime extends DateTime {
     }
     if ( $this->is_date ) return $gmt->format('Ymd');
     return $gmt->format('Ymd\THis\Z');
+  }
+
+
+  public function FloatOrUTC() {
+    $gmt = clone($this);
+    if ( isset($this->tzid) && $this->tzid != 'UTC' ) {
+      $dtz = parent::getTimezone();
+      $offset = 0 - $dtz->getOffset($gmt);
+      $gmt->modify( $offset . ' seconds' );
+    }
+    if ( $this->is_date ) return $gmt->format('Ymd');
+    $result = $gmt->format('Ymd\THis');
+    if ( isset($this->tzid) ) $result .= 'Z';
+    return $result;
   }
 
 
@@ -760,15 +815,13 @@ function expand_event_instances( $vResource, $range_start = null, $range_end = n
     }
     if ( !isset($dtstart) ) {
       $dtstart = $comp->GetProperty('DTSTART');
-      $tzid = $dtstart->GetParameterValue('TZID');
-      $dtstart = new RepeatRuleDateTime( $dtstart->Value(), $tzid );
+      $dtstart = new RepeatRuleDateTime( $dtstart );
       $instances[$dtstart->UTC()] = $comp;
     }
     $p = $comp->GetProperty('RECURRENCE-ID');
     if ( isset($p) && $p->Value() != '' ) {
       $range = $p->GetParameterValue('RANGE');
-      $recur_tzid = $p->GetParameterValue('TZID');
-      $recur_utc = new RepeatRuleDateTime($p->Value(),$recur_tzid);
+      $recur_utc = new RepeatRuleDateTime($p);
       $recur_utc = $recur_utc->UTC();
       if ( isset($range) && $range == 'THISANDFUTURE' ) {
         foreach( $instances AS $k => $v ) {
@@ -798,10 +851,10 @@ function expand_event_instances( $vResource, $range_start = null, $range_end = n
     $duration = $comp->GetProperty('DURATION');
     if ( !isset($duration) || $duration->Value() == '' ) {
       $instance_start = $comp->GetProperty('DTSTART');
-      $dtsrt = new RepeatRuleDateTime( $instance_start->Value(), $instance_start->GetParameterValue('TZID'));
+      $dtsrt = new RepeatRuleDateTime( $instance_start );
       $instance_end = $comp->GetProperty($end_type);
       if ( isset($instance_end) ) {
-        $dtend = new RepeatRuleDateTime( $instance_end->Value(), $instance_end->GetParameterValue('TZID'));
+        $dtend = new RepeatRuleDateTime( $instance_end );
         $duration = $dtstart->RFC5545Duration( $dtend );
       }
       else {

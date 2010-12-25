@@ -1,0 +1,25 @@
+#
+# addressbook-multiget REPORT on addressbook resource
+#
+TYPE=REPORT
+URL=http://mycaldav/caldav.php/user1/addressbook/
+HEADER=User-Agent: DAViCalTester/public
+HEADER=Content-Type: text/xml
+HEAD
+
+
+BEGINDATA
+<?xml version="1.0" encoding="utf-8" ?><C:addressbook-multiget xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:carddav"><D:prop><D:getetag/><C:address-data/></D:prop>
+ <D:href>/caldav.php/user1/addressbook/Jörg_Test-Roßdeutscher_3_0.vcf</D:href>
+ <D:href>/caldav.php/user1/addressbook/andrew_mcmillan.vcf</D:href>
+ <D:href>/caldav.php/user1/addressbook/donald_kelly.vcf</D:href>
+ <D:href>/caldav.php/user1/addressbook/F06EC844-EACD-4ADF-8823-588603991E04-ABSPlugin.vcf</D:href>
+ <D:href>/caldav.php/user1/addressbook/van_houtte.vcf</D:href>
+ <D:href>/caldav.php/user1/addressbook/mustrmahn.vcf</D:href>
+ <D:href>/caldav.php/user1/addressbook/andresenesq.vcf</D:href>
+ <D:href>/caldav.php/user1/addressbook/hans_dieter.vcf</D:href>
+ <D:href>/caldav.php/user1/addressbook/Jörg_Test-Roßdeutscher_2_0.vcf</D:href>
+</C:addressbook-multiget>
+ENDDATA
+
+

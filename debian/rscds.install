@@ -1,5 +1,0 @@
-dba htdocs inc locale usr/share/rscds
-debian/keepme etc/davical/.keep
-config/example-config.php usr/share/doc/rscds/examples/davical-conf.php
-config/example-administration.yml usr/share/doc/rscds/examples/administration.yml
-config/debug-config.php config/other-config.php usr/share/doc/rscds/examples

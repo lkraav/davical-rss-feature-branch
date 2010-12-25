@@ -368,7 +368,7 @@ if ( $editor->Available() ) {
       $_POST['by_collection'] = $id;
       $to_principal = intval($_POST['to_principal']);
       $orig_to_id =  intval($_POST['orig_to_id']);
-      $grantrow->SetWhere( "by_collection=".qpg($id)." AND to_principal=$orig_to_id");
+      $grantrow->SetWhere( "by_collection=".$id." AND to_principal=$orig_to_id");
       if ( isset($_POST['grant_privileges']) ) {
         $privilege_bitpos = array_flip($privilege_names);
         $priv_names = array_keys($_POST['grant_privileges']);

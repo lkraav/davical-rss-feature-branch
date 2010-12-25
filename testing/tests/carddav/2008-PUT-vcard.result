@@ -1,0 +1,39 @@
+HTTP/1.1 201 Created
+Date: Dow, 01 Jan 2000 00:00:00 GMT
+DAV: 1, 2, 3, access-control, calendar-access, calendar-schedule
+DAV: extended-mkcol, calendar-proxy, bind, addressbook
+ETag: "70da8e376791d07c9fae3dbda0b40314"
+Content-Length: 0
+Content-Type: text/plain; charset="utf-8"
+
+
+        caladruri: >NULL<
+           caluri: >NULL<
+         dav_etag: >70da8e376791d07c9fae3dbda0b40314<
+         dav_name: >/user1/addressbook/PHRsMa4mvY.vcf<
+            fburl: >NULL<
+               fn: >zzz<
+                n: >zzz;;;;<
+         nickname: >NULL<
+             note: >NULL<
+              org: >NULL<
+              uid: >PHRsMa4mvY<
+              url: >NULL<
+          version: >3.0<
+
+           box_no: >NULL<
+          country: >NULL<
+         locality: >NULL<
+         postcode: >NULL<
+         property: >NULL<
+           region: >NULL<
+   street_address: >NULL<
+             type: >NULL<
+          unit_no: >NULL<
+
+              tel: >NULL<
+             type: >NULL<
+
+            email: >zzz@xxx.ru<
+             type: >NULL<
+

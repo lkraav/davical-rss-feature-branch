@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<schedule-response xmlns="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav">
+ <C:response>
+  <C:request-status>2.0;Success</C:request-status>
+ </C:response>
+</schedule-response>

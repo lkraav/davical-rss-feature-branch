@@ -6,18 +6,6 @@ set -e
 PACKAGE=::package::
 [ -n "${DEBUG}" ] && echo "PostInst Parameters: $@"
 
-#
-# Migrate directory location to /etc/davical from /etc/rscds
-#
-if [ -d /etc/rscds -a -d /etc/davical -a ! -h /etc/rscds ]; then
-  for CNFFILE in /etc/rscds/*; do
-    if [ -f "${CNFFILE}" ]; then
-      mv "${CNFFILE}" /etc/davical
-    fi
-  done
-  rmdir /etc/rscds
-fi
-
 case $1 in
   configure)
       # Attempt to run the database upgrade script with default

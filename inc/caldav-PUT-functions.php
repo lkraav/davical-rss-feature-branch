@@ -16,7 +16,7 @@
 */
 
 require_once('iCalendar.php');
-require_once('DAVResource.php');
+require_once('WritableCollection.php');
 
 $bad_events = null;
 
@@ -65,7 +65,7 @@ function rollback_on_error( $caldav_context, $user_no, $path, $message='', $erro
 * @param boolean $public Whether the collection will be public, should we need to create it
 */
 function controlRequestContainer( $username, $user_no, $path, $caldav_context, $public = null ) {
-  global $c, $bad_events;
+  global $c, $request, $bad_events;
 
   // Check to see if the path is like /foo /foo/bar or /foo/bar/baz etc. (not ending with a '/', but contains at least one)
   if ( preg_match( '#^(.*/)([^/]+)$#', $path, $matches ) ) {//(
@@ -310,8 +310,24 @@ function handle_schedule_reply ( $ical ) {
 * @param iCalProp $attendee The attendee we are scheduling
 * @return float The result of the scheduling request, per caldav-sched #3.5.4
 */
-function write_scheduling_request( &$resource, $attendee ) {
-  $response = '5.3;'.translate('No scheduling support for user');
+function write_scheduling_request( &$resource, $attendee_value, $create_resource ) {
+  $email = preg_replace( '/^mailto:/', '', $attendee_value );
+  $schedule_target = getUserByEmail($email);
+  if ( isset($schedule_target) && is_object($schedule_target) ) {
+    $attendee_inbox = new WritableCollection(array('path' => $schedule_target->dav_name.'.in/'));
+    if ( ! $attendee_inbox->HavePrivilegeTo('schedule-deliver-invite') ) {
+      $response = '3.8;'.translate('No authority to deliver invitations to user.');
+    }
+    if ( $attendee_inbox->WriteCalendarMember($resource, $create_resource) ) {
+      $response = '2.0;'.translate('Scheduling invitation delivered successfully');
+    }
+    else {
+      $response = '5.3;'.translate('No scheduling support for user');
+    }
+  }
+  else {
+    $response = '5.3;'.translate('No scheduling support for user');
+  }
   return '"'.$response.'"';
 }
 
@@ -340,7 +356,7 @@ function create_scheduling_requests( &$resource ) {
 
   dbg_error_log( 'PUT', 'Adding to scheduling inbox %d attendees', count($attendees) );
   foreach( $attendees AS $attendee ) {
-    $attendee->SetParameterValue( 'SCHEDULE-STATUS', write_scheduling_request( $resource, $attendee->Value() ) );
+    $attendee->SetParameterValue( 'SCHEDULE-STATUS', write_scheduling_request( $resource, $attendee->Value(), true ) );
   }
 }
 
@@ -370,7 +386,7 @@ function update_scheduling_requests( &$resource ) {
 
   dbg_error_log( 'PUT', 'Adding to scheduling inbox %d attendees', count($attendees) );
   foreach( $attendees AS $attendee ) {
-    $attendee->SetParameterValue( 'SCHEDULE-STATUS', write_scheduling_request( $resource, $attendee->Value() ) );
+    $attendee->SetParameterValue( 'SCHEDULE-STATUS', write_scheduling_request( $resource, $attendee->Value(), false ) );
   }
 }
 
@@ -501,7 +517,8 @@ EOSQL;
     else {
       $dtend = 'NULL';
       if ( $first->GetPValue('DURATION') != '' AND $dtstart != '' ) {
-        $duration = preg_replace( '#[PT]#', ' ', $first->GetPValue('DURATION') );
+        $duration = trim(preg_replace( '#[PT]#', ' ', $first->GetPValue('DURATION') ));
+        if ( $duration == '' ) $duration = '0 seconds';
         $dtend = '(:dtstart::timestamp with time zone + :duration::interval)';
         $calitem_params[':duration'] = $duration;
       }
@@ -787,7 +804,8 @@ function write_resource( $user_no, $path, $caldav_data, $collection_id, $author,
   else {
     $dtend = 'NULL';
     if ( $first->GetPValue('DURATION') != '' AND $dtstart != '' ) {
-      $duration = preg_replace( '#[PT]#', ' ', $first->GetPValue('DURATION') );
+      $duration = trim(preg_replace( '#[PT]#', ' ', $first->GetPValue('DURATION') ));
+      if ( $duration == '' ) $duration = '0 seconds';
       $dtend = '(:dtstart::timestamp with time zone + :duration::interval)';
       $calitem_params[':duration'] = $duration;
     }

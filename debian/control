@@ -10,9 +10,8 @@ Homepage: http://davical.org/
 
 Package: davical
 Architecture: all
-Depends: ${misc:Depends}, debconf (>= 1.0.32), php5-pgsql, postgresql-client-9.0 | postgresql-client-8.4 | postgresql-client-8.3 | postgresql-client-8.2 | postgresql-client-8.1, libawl-php (= 0.45-0), libdbd-pg-perl, libyaml-perl
+Depends: ${misc:Depends}, debconf (>= 1.0.32), php5-pgsql, postgresql-client-9.0 | postgresql-client-8.4 | postgresql-client-8.3 | postgresql-client-8.2 | postgresql-client-8.1, libawl-php (= 0.46-1), libdbd-pg-perl, libyaml-perl
 Recommends: postgresql (>= 8.1)
-Conflicts: rscds
 Description: The DAViCal CalDAV Server
  The DAViCal CalDAV Server is designed to trivially store
  CalDAV calendars, such as those from Evolution, Sunbird/Lightning,
