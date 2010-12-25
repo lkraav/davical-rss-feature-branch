@@ -1,0 +1,9 @@
+Summary: add rss/atom feed support for collections
+Status: New
+CreatedBy: leho <leho@kraav.com>
+AssignedTo: 
+DueDate: 
+Inserted: 2010-12-25T13:53:22
+Updated: 2010-12-25T13:53:22
+
+It is usually not possible to easily or reliably notice newly created events in multi-user multi-calendar scenarios, especially if some events are created further in future or past i.e. far out of current (monthly, multi-week) views. RSS/Atom feeds provide a solution to this.
