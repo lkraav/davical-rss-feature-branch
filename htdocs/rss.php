@@ -143,7 +143,6 @@ function caldav_get_rss( $request ) {
         
         $item->setDescription($description);
       $feed->addEntry($item);
-      //break;
     }
 
     $response = $feed->export('rss');
