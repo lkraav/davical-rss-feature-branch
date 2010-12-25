@@ -82,7 +82,7 @@ function caldav_get_rss( $request ) {
         $event_data = $ical->GetComponents( 'VTODO', true );
         if ( !count($event_data) ) {
           echo "wack event_data found";
-          print_r($ical);
+          dbg_log_array( 'rss', 'ical', $ical, true );
         }
         else {
           $is_todo = true;
