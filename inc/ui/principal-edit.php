@@ -813,7 +813,7 @@ function confirm_delete_ticket($confirmation_hash) {
 
 
 function principal_collection_browser() {
-  global $page_elements, $id, $editor;
+  global $c, $page_elements, $id, $editor;
 
   $browser = new Browser(translate('Principal Collections'));
 
