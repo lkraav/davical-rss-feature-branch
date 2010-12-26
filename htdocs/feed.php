@@ -60,7 +60,6 @@ function caldav_get_feed( $request ) {
       $sql .= 'caldav_data.collection_id = :collection_id ';
       $params = array( ':collection_id' => $collection->resource_id() );
     }
-    $c->feed_item_limit = "ALL";
     $sql .= ' ORDER BY caldav_data.modified DESC';
     $sql .= ' LIMIT '.(isset($c->feed_item_limit) ? $c->feed_item_limit : 15);
     $qry = new AwlQuery( $sql, $params );
