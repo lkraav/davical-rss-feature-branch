@@ -38,7 +38,7 @@ class AtomEntry {
     <summary type="html"><![CDATA[Have a microparty. All the best parties are monthly!]]></summary>
     <published>2008-10-25T11:07:49+13:00</published>
     <updated>2010-12-27T06:49:16+13:00</updated>
-    <id>http://mycaldav/rss.php/rss.php/user1/home/MICROPARTY-77C6-4FB7-BDD3-6882E2F1BE74.ics#UID:MICROPARTY-77C6-4FB7-BDD3-6882E2F1BE74</id>
+    <id>http://mycaldav/feed.php/user1/home/MICROPARTY-77C6-4FB7-BDD3-6882E2F1BE74.ics#UID:MICROPARTY-77C6-4FB7-BDD3-6882E2F1BE74</id>
     <content xmlns:xhtml="http://www.w3.org/1999/xhtml" type="xhtml">
       <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml"><xhtml:strong>Time:</xhtml:strong> 2008-11-21 16:00:00<xhtml:br/><xhtml:br/><xhtml:strong>Description</xhtml:strong>:<xhtml:br/>Have a microparty. All the best parties are monthly!</xhtml:div>
 
@@ -144,16 +144,16 @@ class AtomFeed extends XMLDocument {
   }
 
   /*
-  <id>http://mycaldav/rss.php/user1/home.ics</id>
-  <title type="text">CalDAV RSS Feed: User 1's Calendaranza</title>
+  <id>http://mycaldav/feed.php/user1/home.ics</id>
+  <title type="text">CalDAV Feed: User 1's Calendaranza</title>
   <updated>2010-12-26T17:49:16+13:00</updated>
   <generator uri="http://framework.zend.com" version="1.10.7">Zend_Feed_Writer</generator>
-  <link rel="alternate" type="text/html" href="http://mycaldav/rss.php/user1/home.ics"/>
-  <link rel="self" type="application/atom+xml" href="http://mycaldav/rss.php/user1/home/"/>
+  <link rel="alternate" type="text/html" href="http://mycaldav/feed.php/user1/home.ics"/>
+  <link rel="self" type="application/atom+xml" href="http://mycaldav/feed.php/user1/home/"/>
   <author>
     <name>User 1</name>
     <email>user1@example.net</email>
-    <uri>http://mycaldav/rss.php/caldav.php/user1/</uri>
+    <uri>http://mycaldav/feed.php/caldav.php/user1/</uri>
   </author>
   */
 

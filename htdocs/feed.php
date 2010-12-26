@@ -1,12 +1,12 @@
 <?php
 /**
- * A script for returning an RSS (Atom) feed of recent changes to a calendar collection
+ * A script for returning a feed (currently Atom) of recent changes to a calendar collection
  * @author Leho Kraav <leho@kraav.com>
  * @author Andrew McMillan <andrew@morphoss.com>
  * @license GPL v2 or later
  */
 require_once("./always.php");
-dbg_error_log( "rss", " User agent: %s", ((isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : "Unfortunately Mulberry and Chandler don't send a 'User-agent' header with their requests :-(")) );
+dbg_error_log( "feed", " User agent: %s", ((isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : "Unfortunately Mulberry and Chandler don't send a 'User-agent' header with their requests :-(")) );
 dbg_log_array( "headers", '_SERVER', $_SERVER, true );
 
 require_once("HTTPAuthSession.php");
@@ -23,10 +23,10 @@ function hyperlink( $text ) {
   return preg_replace( '@(https?://([-\w\.]+[-\w])+(:\d+)?(/([\w/_\.#-]*(\?\S+)?[^\.\s])?)?)@', '<a href="$1" target="_blank">$1</a>', $text );
 }
 
-function caldav_get_rss( $request ) {
+function caldav_get_feed( $request ) {
   global $c;
 
-  dbg_error_log("rss", "GET method handler");
+  dbg_error_log("feed", "GET method handler");
 
   require_once("vComponent.php");
   require_once("DAVResource.php");
@@ -40,7 +40,7 @@ function caldav_get_rss( $request ) {
 
   if ( $collection->IsCollection() ) {
     if ( ! $collection->IsCalendar() && !(isset($c->get_includes_subcollections) && $c->get_includes_subcollections) ) {
-      $request->DoResponse( 405, translate("RSS feeds are only supported for calendars at present.") );
+      $request->DoResponse( 405, translate("Feeds are only supported for calendars at present.") );
     }
     
     $principal = $collection->GetProperty('principal');
@@ -60,23 +60,23 @@ function caldav_get_rss( $request ) {
       $sql .= 'caldav_data.collection_id = :collection_id ';
       $params = array( ':collection_id' => $collection->resource_id() );
     }
-    $c->rss_item_limit = "ALL";
+    $c->feed_item_limit = "ALL";
     $sql .= ' ORDER BY caldav_data.modified DESC';
-    $sql .= ' LIMIT '.(isset($c->rss_item_limit) ? $c->rss_item_limit : 15);
+    $sql .= ' LIMIT '.(isset($c->feed_item_limit) ? $c->feed_item_limit : 15);
     $qry = new AwlQuery( $sql, $params );
     if ( !$qry->Exec("GET",__LINE__,__FILE__) ) {
       $request->DoResponse( 500, translate("Database Error") );
     }
 
     /**
-     * Here we are constructing the RSS feed response for this collection, including
+     * Here we are constructing the feed response for this collection, including
      * the timezones that are referred to by the events we have selected.
      * Library used: http://framework.zend.com/manual/en/zend.feed.writer.html
      */
     require_once('AtomFeed.php');
     $feed = new AtomFeed();
 
-    $feed->setTitle('CalDAV RSS Feed: '. $collection->GetProperty('displayname'));
+    $feed->setTitle('CalDAV Feed: '. $collection->GetProperty('displayname'));
     $url = $c->protocol_server_port . $collection->url();
     $url = preg_replace( '{/$}', '.ics', $url);
     $feed->setLink($url);
@@ -177,12 +177,12 @@ function caldav_get_rss( $request ) {
 }
 
 if ( $request->method == 'GET' ) {
-  caldav_get_rss( $request );
+  caldav_get_feed( $request );
 }
 else {
-  dbg_error_log( 'rss', 'Unhandled request method >>%s<<', $request->method );
-  dbg_log_array( 'rss', '_SERVER', $_SERVER, true );
-  dbg_error_log( 'rss', 'RAW: %s', str_replace("\n", '',str_replace("\r", '', $request->raw_post)) );
+  dbg_error_log( 'feed', 'Unhandled request method >>%s<<', $request->method );
+  dbg_log_array( 'feed', '_SERVER', $_SERVER, true );
+  dbg_error_log( 'feed', 'RAW: %s', str_replace("\n", '',str_replace("\r", '', $request->raw_post)) );
 }
 
 $request->DoResponse( 500, translate('The application program does not understand that request.') );
