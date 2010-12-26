@@ -126,14 +126,14 @@ function caldav_get_feed( $request ) {
       $dt_start = $event_data[0]->GetProperty('DTSTART');
       if  ( $dt_start != null ) {
         $dt_start = new RepeatRuleDateTime($dt_start);
-        $p_time = '<strong>' . translate('Time') . ':</strong> ' . $dt_start->format(translate('Y-m-d H:i:s'));
+        $p_time = '<strong>' . translate('Time') . ':</strong> ' . strftime(translate('%F %T'), $dt_start->epoch());
 
         $dt_end = $event_data[0]->GetProperty('DTEND');
         if  ( $dt_end != null ) {
           $dt_end = new RepeatRuleDateTime($dt_end);
           $p_time .= ' - ' . ( $dt_end->AsDate() == $dt_start->AsDate()
-                                   ? $dt_end->format(translate('H:i:s'))
-                                   : $dt_end->format(translate('Y-m-d H:i:s'))
+                                   ? strftime(translate('%T'), $dt_end->epoch())
+                                   : strftime(translate('%F %T'), $dt_end->epoch())
                               );
         }
         $content .= $p_time;
