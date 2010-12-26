@@ -132,8 +132,8 @@ function caldav_get_feed( $request ) {
         if  ( $dt_end != null ) {
           $dt_end = new RepeatRuleDateTime($dt_end);
           $p_time .= ' - ' . ( $dt_end->AsDate() == $dt_start->AsDate()
-                                   ? $p_time .= $dt_end->format(translate('H:i:s'))
-                                   : $p_time .= $dt_end->format(translate('Y-m-d H:i:s'))
+                                   ? $dt_end->format(translate('H:i:s'))
+                                   : $dt_end->format(translate('Y-m-d H:i:s'))
                               );
         }
         $content .= $p_time;
