@@ -22,3 +22,5 @@ INSERT INTO supported_locales ( locale, locale_name_en, locale_name_locale )
     VALUES( 'it_IT', 'Italian',  'Italiano' );
 INSERT INTO supported_locales ( locale, locale_name_en, locale_name_locale )
     VALUES( 'sv_SE', 'Swedish',  'Svenska' );
+INSERT INTO supported_locales ( locale, locale_name_en, locale_name_locale )
+    VALUES( 'et_EE', 'Estonian',  'Eesti' );
