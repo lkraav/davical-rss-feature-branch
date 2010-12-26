@@ -154,6 +154,11 @@ function caldav_get_feed( $request ) {
       $content .= '<br />'
       .'<strong>' . translate('URL') . '</strong>: ' . hyperlink($p_url->Value());
 
+      $p_cat = $event_data[0]->GetProperty('CATEGORIES');
+      if ( $p_cat != null )
+      $content .= '<br />'
+      .'<strong>' . translate('Categories') . '</strong>: ' . $p_cat->Value();
+
       $p_description = $event_data[0]->GetProperty('DESCRIPTION');
       if ( $p_description != null && $p_description->Value() != '' ) {
         $content .= '<br />'
