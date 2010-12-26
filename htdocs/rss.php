@@ -72,8 +72,8 @@ function caldav_get_rss( $request ) {
      * the timezones that are referred to by the events we have selected.
      * Library used: http://framework.zend.com/manual/en/zend.feed.writer.html
      */
-    require_once('Zend/Feed/Writer/Feed.php');
-    $feed = new Zend_Feed_Writer_Feed;
+    require_once('AtomFeed.php');
+    $feed = new AtomFeed();
 
     $feed->setTitle('CalDAV RSS Feed: '. $collection->GetProperty('displayname'));
     $url = $c->protocol_server_port . $collection->url();

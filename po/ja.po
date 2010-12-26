@@ -970,7 +970,7 @@ msgstr "状態"
 
 #, c-format
 msgid "Status: %d, Message: %s, User: %d, Path: %s"
-msgstr "状態: %s, メッセージ: %s, ユーザー: %d, パス: %s"
+msgstr "状態: %d, メッセージ: %s, ユーザー: %d, パス: %s"
 
 msgid "Submit"
 msgstr "送信"
