@@ -485,20 +485,20 @@ EOSQL;
   function FetchPrincipal() {
     if ( isset($this->principal) ) return;
     $this->principal = new CalDAVPrincipal( array( "path" => $this->bound_from() ) );
-    if ( $this->_is_principal && $this->principal->Exists() ) {
-      $this->exists = true;
-      $this->unique_tag = '"'.$this->principal->dav_etag.'"';
-      $this->created = $this->principal->created;
-      $this->modified = $this->principal->modified;
-      $this->resourcetypes = '<DAV::collection/><DAV::principal/>';
-      $this->resource_id = $this->principal->principal_id;
-      $this->collection = $this->principal->AsCollection();
-      $this->user_no = $this->principal->user_no;
-    }
-    elseif ( $this->_is_principal ) {
-      $this->exists = false;
+    if ( $this->_is_principal ) {
+      $this->exists = $this->principal->Exists();
       $this->collection->dav_name = $this->dav_name;
       $this->collection->type = 'principal';
+      if ( $this->exists ) {
+        $this->displayname = $this->principal->GetProperty('displayname');
+        $this->unique_tag = '"'.$this->principal->dav_etag.'"';
+        $this->created = $this->principal->created;
+        $this->modified = $this->principal->modified;
+        $this->resourcetypes = '<DAV::collection/><DAV::principal/>';
+        $this->resource_id = $this->principal->principal_id;
+        $this->collection = $this->principal->AsCollection();
+        $this->user_no = $this->principal->user_no;
+      }
     }
   }
 
@@ -1019,6 +1019,17 @@ EOQRY;
 
 
   /**
+  * Returns the URL of our resource
+  */
+  function url() {
+    if ( !isset($this->dav_name) ) {
+      throw Exception("What! How can dav_name not be set?");
+    }
+    return ConstructURL($this->dav_name);
+  }
+
+
+  /**
   * Returns the dav_name of the resource in our internal namespace
   */
   function dav_name() {
@@ -1069,10 +1080,7 @@ EOQRY;
   */
   function principal_url() {
     if ( !isset($this->principal) ) $this->FetchPrincipal();
-    if ( $this->principal->Exists() ) {
-      return $this->principal->principal_url;
-    }
-    return null;
+    return $this->principal->url();
   }
 
 
@@ -1236,8 +1244,21 @@ EOQRY;
           return $type_list;
         }
 
+      case 'resource':
+        if ( !isset($this->resource) ) $this->FetchResource();
+        return clone($this->resource);
+        break;
+
+      case 'principal':
+        if ( !isset($this->principal) ) $this->FetchPrincipal();
+        return clone($this->principal);
+        break;
+
       default:
-        if ( isset($this->{$name}) ) return $this->{$name};
+        if ( isset($this->{$name}) ) {
+          if ( ! is_object($this->{$name}) ) return $this->{$name};
+          return clone($this->{$name});
+        } 
         if ( $this->_is_principal ) {
           if ( !isset($this->principal) ) $this->FetchPrincipal();
           if ( isset($this->principal->{$name}) ) return $this->principal->{$name};
@@ -1254,7 +1275,11 @@ EOQRY;
           if ( isset($this->principal->{$name}) ) return $this->principal->{$name};
           if ( isset($this->collection->{$name}) ) return $this->collection->{$name};
         }
-//        dbg_error_log( 'DAVResource', ':GetProperty: Failed to find property "%s" on "%s".', $name, $this->dav_name );
+        if ( isset($this->{$name}) ) {
+          if ( ! is_object($this->{$name}) ) return $this->{$name};
+          return clone($this->{$name});
+        } 
+        // dbg_error_log( 'DAVResource', ':GetProperty: Failed to find property "%s" on "%s".', $name, $this->dav_name );
     }
 
     return $value;

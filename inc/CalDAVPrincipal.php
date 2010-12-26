@@ -27,7 +27,7 @@ class CalDAVPrincipal
   /**
   * @var The home URL of the principal
   */
-  var $url;
+  private $url;
 
   /**
   * @var Identifies whether this principal exists in the DB yet
@@ -432,6 +432,38 @@ class CalDAVPrincipal
       else $this->dav_name = '/'.$this->username.'/';
     }
     return $this->dav_name;
+  }
+
+
+  /**
+  * Return an arbitrary property
+  * @return string The name of the arbitrary property
+  */
+  function GetProperty( $property_id ) {
+
+    switch( $property_id ) {
+      case 'DAV::resource-id':
+        if ( $this->exists && $this->principal_id > 0 )
+          ConstructURL('/.resources/'.$this->principal_id);
+        else
+          return null;
+        break;
+    }
+
+    if ( isset($this->{$property_id}) ) {
+      if ( ! is_object($this->{$property_id}) ) return $this->{$property_id};
+      return clone($this->{$property_id});
+    } 
+    return null;
+  }
+
+
+  /**
+  * Return the URL for this principal
+  * @return string The principal-URL, or null if they don't exist
+  */
+  function url() {
+    return ($this->exists ? $this->url : null );
   }
 
 

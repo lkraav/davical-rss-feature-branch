@@ -1,4 +1,10 @@
 <?php
+/**
+ * A script for returning an RSS (Atom) feed of recent changes to a calendar collection
+ * @author Leho Kraav <leho@kraav.com>
+ * @author Andrew McMillan <andrew@morphoss.com>
+ * @license GPL v2 or later
+ */
 require_once("./always.php");
 dbg_error_log( "rss", " User agent: %s", ((isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : "Unfortunately Mulberry and Chandler don't send a 'User-agent' header with their requests :-(")) );
 dbg_log_array( "headers", '_SERVER', $_SERVER, true );
@@ -10,155 +16,171 @@ require_once('CalDAVRequest.php');
 $request = new CalDAVRequest();
 
 /**
-* Function for creating anchor links out of plain text.
-* Source: http://stackoverflow.com/questions/1960461/convert-plain-text-hyperlinks-into-html-hyperlinks-in-php
-*/ 
+ * Function for creating anchor links out of plain text.
+ * Source: http://stackoverflow.com/questions/1960461/convert-plain-text-hyperlinks-into-html-hyperlinks-in-php
+ */
 function hyperlink( $text ) {
   return preg_replace( '@(https?://([-\w\.]+[-\w])+(:\d+)?(/([\w/_\.#-]*(\?\S+)?[^\.\s])?)?)@', '<a href="$1" target="_blank">$1</a>', $text );
 }
 
 function caldav_get_rss( $request ) {
-	dbg_error_log("rss", "GET method handler");
+  global $c;
 
-	require_once("iCalendar.php");
-	require_once("DAVResource.php");
+  dbg_error_log("rss", "GET method handler");
 
-	$dav_resource = new DAVResource($request->path);
-	$dav_resource->NeedPrivilege( array('urn:ietf:params:xml:ns:caldav:read-free-busy','DAV::read') );
+  require_once("vComponent.php");
+  require_once("DAVResource.php");
 
-	if ( ! $dav_resource->Exists() ) {
-	  $request->DoResponse( 404, translate("Resource Not Found.") );
-	}
+  $collection = new DAVResource($request->path);
+  $collection->NeedPrivilege( array('urn:ietf:params:xml:ns:caldav:read-free-busy','DAV::read') );
 
-  if ( $dav_resource->IsCollection() ) {
-    if ( ! $dav_resource->IsCalendar() && !(isset($c->get_includes_subcollections) && $c->get_includes_subcollections) ) {
-      /** RFC2616 says we must send an Allow header if we send a 405 */
-      header("Allow: PROPFIND,PROPPATCH,OPTIONS,MKCOL,REPORT,DELETE");
-      $request->DoResponse( 405, translate("GET requests on collections are only supported for calendars.") );
+  if ( ! $collection->Exists() ) {
+    $request->DoResponse( 404, translate("Resource Not Found.") );
+  }
+
+  if ( $collection->IsCollection() ) {
+    if ( ! $collection->IsCalendar() && !(isset($c->get_includes_subcollections) && $c->get_includes_subcollections) ) {
+      $request->DoResponse( 405, translate("RSS feeds are only supported for calendars at present.") );
     }
-
-	  /**
-	  * The CalDAV specification does not define GET on a collection, but typically this is
-	  * used as a .ics download for the whole collection, which is what we do also.
-	  */
-	  $sql = 'SELECT caldav_data, class, caldav_type, calendar_item.user_no, logged_user ';
-	  $sql .= 'FROM collection INNER JOIN caldav_data USING(collection_id) INNER JOIN calendar_item USING ( dav_id ) WHERE ';
-	  if ( isset($c->get_includes_subcollections) && $c->get_includes_subcollections ) {
+    
+    $principal = $collection->GetProperty('principal');
+    
+    /**
+     * The CalDAV specification does not define GET on a collection, but typically this is
+     * used as a .ics download for the whole collection, which is what we do also.
+     */
+    $sql = 'SELECT caldav_data, class, caldav_type, calendar_item.user_no, caldav_data.dav_name ';
+    $sql .= 'FROM collection INNER JOIN caldav_data USING(collection_id) INNER JOIN calendar_item USING ( dav_id ) WHERE ';
+    if ( isset($c->get_includes_subcollections) && $c->get_includes_subcollections ) {
       $sql .= '(collection.dav_name ~ :path_match ';
       $sql .= 'OR collection.collection_id IN (SELECT bound_source_id FROM dav_binding WHERE dav_binding.dav_name ~ :path_match)) ';
       $params = array( ':path_match' => '^'.$request->path );
-	  }
-	  else {
+    }
+    else {
       $sql .= 'caldav_data.collection_id = :collection_id ';
-      $params = array( ':collection_id' => $dav_resource->resource_id() );
-	  }
-	  if ( isset($c->strict_result_ordering) && $c->strict_result_ordering ) $sql .= ' ORDER BY dav_id';
-      $qry = new AwlQuery( $sql, $params );
-      if ( !$qry->Exec("GET",__LINE__,__FILE__) ) {
+      $params = array( ':collection_id' => $collection->resource_id() );
+    }
+    $sql .= ' ORDER BY caldav_data.modified DESC';
+    $sql .= ' LIMIT '.(isset($c->rss_item_limit) ? $c->rss_item_limit : 15);
+    $qry = new AwlQuery( $sql, $params );
+    if ( !$qry->Exec("GET",__LINE__,__FILE__) ) {
       $request->DoResponse( 500, translate("Database Error") );
-	  }
-    
-	  /**
-	  * Here we are constructing the RSS feed response for this collection, including
-	  * the timezones that are referred to by the events we have selected.
-	  * Library used: http://framework.zend.com/manual/en/zend.feed.writer.html
-	  */
+    }
+
+    /**
+     * Here we are constructing the RSS feed response for this collection, including
+     * the timezones that are referred to by the events we have selected.
+     * Library used: http://framework.zend.com/manual/en/zend.feed.writer.html
+     */
     require_once('Zend/Feed/Writer/Feed.php');
     $feed = new Zend_Feed_Writer_Feed;
 
-    $feed->setTitle('CalDAV RSS Feed: '. $dav_resource->GetProperty('displayname'));
-    $feed->setLink('http://www.google.com');
-    $feed->setDescription('This is test of creating a Zend Feed.');
+    $feed->setTitle('CalDAV RSS Feed: '. $collection->GetProperty('displayname'));
+    $url = $c->protocol_server_port . $collection->url();
+    $url = preg_replace( '{/$}', '.ics', $url);
+    $feed->setLink($url);
+    $feed->setFeedLink($c->protocol_server_port_script . $request->path, 'atom');
+    $feed->addAuthor(array(
+    			'name'  => $principal->GetProperty('displayname'),
+    			'email' => $principal->GetProperty('email'),
+    			'uri'   => $c->protocol_server_port . $principal->url(),
+    ));
+    $feed_description = $collection->GetProperty('description');
+    if ( isset($feed_description) && $feed_description != '' ) $feed->setDescription($feed_description);
 
     require_once('RRule-v2.php');
 
     $need_zones = array();
     $timezones = array();
     while( $event = $qry->Fetch() ) {
-      $is_todo = false;
-      $ical = new iCalComponent( $event->caldav_data );
-      $event_data = $ical->GetComponents( 'VEVENT', true );
-      if ( !count($event_data) ) {
-        $event_data = $ical->GetComponents( 'VTODO', true );
-        if ( !count($event_data) ) {
-          echo "wack event_data found";
-          dbg_log_array( 'rss', 'ical', $ical, true );
+      $ical = new vComponent( $event->caldav_data );
+      if ( $ical->GetType() != 'VCALENDAR' ) continue;
+
+      $event_data = $ical->GetComponents('VTIMEZONE', false);
+      $type = (count($event_data) ? $event_data[0]->GetType() : 'null'); 
+
+      if ( ($type!= 'VEVENT' && $type != 'VTODO' && $type != 'VJOURNAL') ) {
+        echo "Skipping peculiar '$type' component in VCALENDAR\n";
+        var_dump($ical);
+        continue;
+      }
+      $is_todo = ($event_data[0]->GetType() == 'VTODO');
+      
+      $item = $feed->createEntry();
+      $uid = $event_data[0]->GetProperty('UID');
+      $item->setId( $c->protocol_server_port_script . ConstructURL($event->dav_name).'#'.$uid );
+
+      $dt_created = new RepeatRuleDateTime( $event_data[0]->GetProperty('CREATED') );
+      $dt_modified = new RepeatRuleDateTime( $event_data[0]->GetProperty('LAST-MODIFIED') );
+      if ( isset($dt_created) ) $item->setDateCreated( $dt_created->epoch() );
+      if ( isset($dt_modified) ) $item->setDateModified( $dt_modified->epoch() );
+
+      // According to karora, there are cases where we get multiple VEVENTs (overrides). I'll just stick this (1/x) notifier in here until I get to repeat event processing.
+      $p_title = $event_data[0]->GetProperty('SUMMARY')->Value() . ' (1/' . (string)count($event_data) . ')';
+      $is_todo ? $p_title = "TODO: " . $p_title : $p_title;
+      $item->setTitle($p_title);
+
+      $content = "";
+
+      $dt_start = $event_data[0]->GetProperty('DTSTART');
+      if  ( $dt_start != null ) {
+        $dt_start = new RepeatRuleDateTime($dt_start);
+        $p_time = '<strong>' . translate('Time') . ':</strong> ' . $dt_start->format(translate('Y-m-d H:i:s'));
+
+        $dt_end = $event_data[0]->GetProperty('DTEND');
+        if  ( $dt_end != null ) {
+          $dt_end = new RepeatRuleDateTime($dt_end);
+          $p_time .= ' - ' . ( $dt_end->AsDate() == $dt_start->AsDate()
+                                   ? $p_time .= $dt_end->format(translate('H:i:s'))
+                                   : $p_time .= $dt_end->format(translate('Y-m-d H:i:s'))
+                              );
         }
-        else {
-          $is_todo = true;
-        }
+        $content .= $p_time;
       }
 
-      $item = $feed->createEntry();
-        $item->setId( $event_data[0]->GetPValue('UID') );
+      $p_location = $event_data[0]->GetProperty('LOCATION');
+      if ( $p_location != null )
+      $content .= '<br />'
+      .'<strong>' . translate('Location') . '</strong>: ' . hyperlink($p_location->Value());
 
-        $dt_created = new RepeatRuleDateTime( $event_data[0]->GetPValue('CREATED') );
-        $dt_modified = new RepeatRuleDateTime( $event_data[0]->GetPValue('LAST-MODIFIED') );
-        if ( $dt_created->isDate() ) $item->setDateCreated( $dt_created->epoch() );
-        if ( $dt_modified->isDate() ) $item->setDateModified( $dt_modified->epoch() );
+      $p_attach = $event_data[0]->GetProperty('ATTACH');
+      if ( $p_attach != null )
+      $content .= '<br />'
+      .'<strong>' . translate('Attachment') . '</strong>: ' . hyperlink($p_attach->Value());
 
-        // According to karora, there are cases where we get multiple VEVENTs (repeats). I'll just stick this (1/x) notifier in here until I get to repeat event processing. 
-        $p_title = $event_data[0]->GetPValue('SUMMARY') . ' (1/' . (string)count($event_data) . ')';
-        $is_todo ? $p_title = "TODO: " . $p_title : $p_title;
-        $item->setTitle($p_title);
+      $p_url = $event_data[0]->GetProperty('URL');
+      if ( $p_url != null )
+      $content .= '<br />'
+      .'<strong>' . translate('URL') . '</strong>: ' . hyperlink($p_url->Value());
 
-        $description = "";
+      $p_description = $event_data[0]->GetProperty('DESCRIPTION');
+      if ( $p_description != null && $p_description->Value() != '' ) {
+        $content .= '<br />'
+        .'<br />'
+        .'<strong>' . translate('Description') . '</strong>:<br />' . ( nl2br($p_description->Value()) )
+        ;
+        if ( $p_description->Value() != '' ) $item->setDescription($p_description->Value());
+      }
 
-        $dt_start = $event_data[0]->GetPValue('DTSTART');
-        if  ( $dt_start != null ) {
-          $dt_start = new RepeatRuleDateTime($dt_start);
-          $p_time = '<strong>' . translate('Time') . ':</strong> ' . $dt_start->format(translate('Y-m-d H:i:s'));
-
-          $dt_end = $event_data[0]->GetPValue('DTEND'); 
-          if  ( $dt_end != null ) {
-            $dt_end = new RepeatRuleDateTime($dt_end);
-            $p_time .= ' - ';
-            $dt_end->AsDate() == $dt_start->AsDate() ? $p_time .= $dt_end->format(translate('H:i:s')) : $p_time .= $dt_end->format(translate('Y-m-d H:i:s'));
-          }
-          $description .= $p_time;
-        }
-
-        $p_location = $event_data[0]->GetPValue('LOCATION');
-        if ( $p_location != null )
-          $description .= '<br />'
-            .'<strong>' . translate('Location') . '</strong>: ' . hyperlink($p_location);
-
-        $p_attach = $event_data[0]->GetPValue('ATTACH');
-        if ( $p_attach != null )
-          $description .= '<br />'
-            .'<strong>' . translate('Attachment') . '</strong>: ' . hyperlink($p_attach);
-
-        $p_url = $event_data[0]->GetPValue('URL');
-        if ( $p_url != null )
-          $description .= '<br />'
-            .'<strong>' . translate('URL') . '</strong>: ' . hyperlink($p_url);
-
-        $p_description = $event_data[0]->GetPValue('DESCRIPTION');
-        if ( $p_description != null ) {
-          $description .= '<br />'
-            .'<br />'
-            .'<strong>' . translate('Description') . '</strong>:<br />' . ( nl2br(hyperlink($p_description)) )
-          ;
-        }
-        
-        $item->setDescription($description);
+      $item->setContent($content);
       $feed->addEntry($item);
+      //break;
     }
-
-    $response = $feed->export('rss');
-	  header( 'Content-Length: '.strlen($response) );
-	  header( 'Etag: '.$dav_resource->unique_tag() );
-	  $request->DoResponse( 200, ($request->method == 'HEAD' ? '' : $response), 'text/xml; charset="utf-8"' );
-	}
+    $feed->setDateModified(time());
+    $response = $feed->export('atom');
+    header( 'Content-Length: '.strlen($response) );
+    header( 'Etag: '.$collection->unique_tag() );
+    $request->DoResponse( 200, ($request->method == 'HEAD' ? '' : $response), 'text/xml; charset="utf-8"' );
+  }
 }
 
 if ( $request->method == 'GET' ) {
-	caldav_get_rss( $request );
+  caldav_get_rss( $request );
 }
 else {
-    dbg_error_log( 'rss', 'Unhandled request method >>%s<<', $request->method );
-    dbg_log_array( 'rss', '_SERVER', $_SERVER, true );
-    dbg_error_log( 'rss', 'RAW: %s', str_replace("\n", '',str_replace("\r", '', $request->raw_post)) );
+  dbg_error_log( 'rss', 'Unhandled request method >>%s<<', $request->method );
+  dbg_log_array( 'rss', '_SERVER', $_SERVER, true );
+  dbg_error_log( 'rss', 'RAW: %s', str_replace("\n", '',str_replace("\r", '', $request->raw_post)) );
 }
 
 $request->DoResponse( 500, translate('The application program does not understand that request.') );

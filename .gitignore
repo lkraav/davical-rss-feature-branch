@@ -36,3 +36,4 @@ testing/tests/*/results
 testing/tests/*/initial.dbdump
 testing/*-dumps
 testing/*.ics
+*.swp

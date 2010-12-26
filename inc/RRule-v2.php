@@ -30,8 +30,8 @@ $rrule_expand_limit = array(
 
 $rrule_day_numbers = array( 'SU' => 0, 'MO' => 1, 'TU' => 2, 'WE' => 3, 'TH' => 4, 'FR' => 5, 'SA' => 6 );
 
-$GLOBALS['debug_rrule'] = false;
-// $GLOBALS['debug_rrule'] = true;
+define( 'DEBUG_RRULE', false );
+// define( 'DEBUG_RRULE', true);
 
 /**
 * Wrap the DateTimeZone class to allow parsing some iCalendar TZID strangenesses
@@ -85,20 +85,25 @@ class RepeatRuleDateTime extends DateTime {
   private $is_date;
 
   public function __construct($date = null, $dtz = null) {
-    if ( !isset(RepeatRuleDateTime::$UTCzone) ) RepeatRuleDateTime::$UTCzone = new RepeatRuleTimeZone('UTC');
+    if ( !isset(self::$UTCzone) ) self::$UTCzone = new RepeatRuleTimeZone('UTC');
     $this->is_date = false;
-    if ( !isset($date) ) return;
+    if ( !isset($date) ) {
+      $date = date('Ymd\THis');            
+      // Floating
+      $dtz = self::$UTCzone;
+      $this->tzid = null;
+    }
 
-    if ( is_object($date) && (gettype($date) == 'vProperty' || gettype($date) == 'iCalProp' ) ) {
-      $tzid = $date->GetProperty('TZID');
+    if ( is_object($date) && method_exists($date,'GetParameterValue') ) {
+      $tzid = $date->GetParameterValue('TZID');
       $actual_date = $date->Value();
       if ( isset($tzid) ) {
         $dtz = new RepeatRuleTimeZone($tzid);
         $this->tzid = $dtz->tzid();
       }
       else {
-        $dtz = RepeatRuleDateTime::$UTCzone;
-        if ( substr($actual_date,strlen($actual_date),1) == 'Z' ) {
+        $dtz = self::$UTCzone;
+        if ( substr($actual_date,-1) == 'Z' ) {
           $this->tzid = 'UTC';
           $actual_date = substr($actual_date, 0, strlen($actual_date) - 1);          
         }
@@ -108,13 +113,15 @@ class RepeatRuleDateTime extends DateTime {
         $this->is_date;
       }
       $date = $actual_date;
-//      printf( "Date%s value with timezone: %s in %s\n", ($this->is_date?"":"Time"), $date, $this->tzid );
+      if ( DEBUG_RRULE ) printf( "Date%s property%s: %s%s\n", ($this->is_date ? "" : "Time"),
+              (isset($this->tzid) ? ' with timezone' : ''), $date,
+              (isset($this->tzid) ? ' in '.$this->tzid : '') );
     }
-    elseif (preg_match('/;?(?:TZID=([^:;]+).*):(\d{8}(T\d{6})?)(Z)?/', $date, $matches) ) {
+    elseif (preg_match('/;TZID= ([^:;]+) (?: ;.* )? : ( \d{8} (?:T\d{6})? ) (Z)?/x', $date, $matches) ) {
       $date = $matches[2];
       $this->is_date = (strlen($date) == 8);
-      if ( isset($matches[4]) && $matches[4] == 'Z' ) {
-        $dtz = RepeatRuleDateTime::$UTCzone;
+      if ( isset($matches[3]) && $matches[3] == 'Z' ) {
+        $dtz = self::$UTCzone;
         $this->tzid = 'UTC';
       }
       else if ( isset($matches[1]) && $matches[1] != '' ) {
@@ -122,35 +129,41 @@ class RepeatRuleDateTime extends DateTime {
         $this->tzid = $dtz->tzid();
       }
       else {
-        $dtz = RepeatRuleDateTime::$UTCzone;
+        $dtz = self::$UTCzone;
         $this->tzid = null;
       }
-//      printf( "Date%s value with timezone: %s in %s\n", ($this->is_date?"":"Time"), $date, $this->tzid );
+      if ( DEBUG_RRULE ) printf( "Date%s property%s: %s%s\n", ($this->is_date ? "" : "Time"),
+              (isset($this->tzid) ? ' with timezone' : ''), $date,
+              (isset($this->tzid) ? ' in '.$this->tzid : '') );
     }
     elseif ( ( $dtz === null || $dtz == '' )
-             && preg_match('{;?VALUE=DATE (?:;[^:]+) : ((?:[12]\d{3}) (?:0[1-9]|1[012]) (?:0[1-9]|[12]\d|3[01]Z?) )$}x', $date, $matches) ) {
+             && preg_match('{;VALUE=DATE (?:;[^:]+) : ((?:[12]\d{3}) (?:0[1-9]|1[012]) (?:0[1-9]|[12]\d|3[01]Z?) )$}x', $date, $matches) ) {
       $this->is_date = true;
       $date = $matches[1];
       // Floating
-      $dtz = RepeatRuleDateTime::$UTCzone;
+      $dtz = self::$UTCzone;
       $this->tzid = null;
-//      printf( "Date value: %s\n", $date );
+      if ( DEBUG_RRULE ) printf( "Floating Date value: %s\n", $date );
     } 
     elseif ( $dtz === null || $dtz == '' ) {
-      $dtz = RepeatRuleDateTime::$UTCzone;
+      $dtz = self::$UTCzone;
       if ( preg_match('/(\d{8}(T\d{6})?)(Z?)/', $date, $matches) ) {
         $date = $matches[1];
         $this->tzid = ( $matches[3] == 'Z' ? 'UTC' : null );
       }
       $this->is_date = (strlen($date) == 8 );
-//      printf( "Date%s value with timezone: %s in %s\n", ($this->is_date?"":"Time"), $date, $this->tzid );
+      if ( DEBUG_RRULE ) printf( "Date%s value with timezone: %s in %s\n", ($this->is_date?"":"Time"), $date, $this->tzid );
     }
     elseif ( is_string($dtz) ) {
       $dtz = new RepeatRuleTimeZone($dtz);
       $this->tzid = $dtz->tzid();
+      $type = gettype($date);
+      if ( DEBUG_RRULE ) printf( "Date%s $type with timezone: %s in %s\n", ($this->is_date?"":"Time"), $date, $this->tzid );
     }
     else {
       $this->tzid = $dtz->getName();
+      $type = gettype($date);
+      if ( DEBUG_RRULE ) printf( "Date%s $type with timezone: %s in %s\n", ($this->is_date?"":"Time"), $date, $this->tzid );
     }
 
     parent::__construct($date, $dtz);
@@ -321,7 +334,7 @@ class RepeatRule {
   public function __construct( $basedate, $rrule ) {
     $this->base = ( is_object($basedate) ? $basedate : new RepeatRuleDateTime($basedate) );
 
-    if ( $GLOBALS['debug_rrule'] ) {
+    if ( DEBUG_RRULE ) {
       printf( "Constructing RRULE based on: '%s', rrule: '%s'\n", $basedate, $rrule );
     }
 
@@ -356,7 +369,7 @@ class RepeatRule {
         /** need to handle the error, but FREQ is mandatory so unlikely */
     }
     $this->frequency_string = sprintf('+%d %s', $this->interval, $this->freq_name );
-    if ( $GLOBALS['debug_rrule'] ) printf( "Frequency modify string is: '%s', base is: '%s'\n", $this->frequency_string, $this->base->format('c') );
+    if ( DEBUG_RRULE ) printf( "Frequency modify string is: '%s', base is: '%s'\n", $this->frequency_string, $this->base->format('c') );
     $this->Start();
   }
 
@@ -389,7 +402,7 @@ class RepeatRule {
     if ( !$this->valid() ) return null;
     if ( !isset($this->instances[$this->position]) ) $this->GetMoreInstances();
     if ( !$this->valid() ) return null;
-    if ( $GLOBALS['debug_rrule'] ) printf( "Returning date from position %d: %s (%s)\n", $this->position, $this->instances[$this->position]->format('c'), $this->instances[$this->position]->UTC() );
+    if ( DEBUG_RRULE ) printf( "Returning date from position %d: %s (%s)\n", $this->position, $this->instances[$this->position]->format('c'), $this->instances[$this->position]->UTC() );
     return $this->instances[$this->position];
   }
 
@@ -424,7 +437,7 @@ class RepeatRule {
       else {
         $this->current_base->modify( $this->frequency_string );
       }
-      if ( $GLOBALS['debug_rrule'] ) printf( "Getting more instances from: '%s' - %d\n", $this->current_base->format('c'), count($this->instances) );
+      if ( DEBUG_RRULE ) printf( "Getting more instances from: '%s' - %d\n", $this->current_base->format('c'), count($this->instances) );
       $this->current_set = array( clone($this->current_base) );
       foreach( $rrule_expand_limit[$this->freq] AS $bytype => $action ) {
         if ( isset($this->{$bytype}) ) $this->{$action.'_'.$bytype}();
@@ -434,7 +447,7 @@ class RepeatRule {
       if ( isset($this->bysetpos) ) $this->limit_bysetpos();
 
       $position = count($this->instances) - 1;
-      if ( $GLOBALS['debug_rrule'] ) printf( "Inserting %d from current_set into position %d\n", count($this->current_set), $position + 1 );
+      if ( DEBUG_RRULE ) printf( "Inserting %d from current_set into position %d\n", count($this->current_set), $position + 1 );
       foreach( $this->current_set AS $k => $instance ) {
         if ( $instance < $this->base ) continue;
         if ( isset($this->until) && $instance > $this->until ) {
@@ -445,7 +458,7 @@ class RepeatRule {
           $got_more = true;
           $position++;
           $this->instances[$position] = $instance;
-          if ( $GLOBALS['debug_rrule'] ) printf( "Added date %s into position %d in current set\n", $instance->format('c'), $position );
+          if ( DEBUG_RRULE ) printf( "Added date %s into position %d in current set\n", $instance->format('c'), $position );
           if ( isset($this->count) && ($position + 1) >= $this->count ) $this->finished = true;
         }
       }
@@ -479,7 +492,7 @@ class RepeatRule {
     foreach( $instances AS $k => $instance ) {
       foreach( $this->bymonth AS $k => $month ) {
         $expanded = $this->date_mask( clone($instance), null, $month, null, null, null, null);
-        if ( $GLOBALS['debug_rrule'] ) printf( "Expanded BYMONTH $month into date %s\n", $expanded->format('c') );
+        if ( DEBUG_RRULE ) printf( "Expanded BYMONTH $month into date %s\n", $expanded->format('c') );
         $this->current_set[] = $expanded;
       }
     }
@@ -512,7 +525,7 @@ class RepeatRule {
       $expanded = clone($day_in_week);
       $expanded->modify( sprintf('+%d day', $offset) );
       $this->current_set[] = $expanded;
-      if ( $GLOBALS['debug_rrule'] ) printf( "Expanded BYDAY(W) $weekday into date %s\n", $expanded->format('c') );
+      if ( DEBUG_RRULE ) printf( "Expanded BYDAY(W) $weekday into date %s\n", $expanded->format('c') );
     }
   }
 
@@ -528,7 +541,7 @@ class RepeatRule {
         $dow = $rrule_day_numbers[$matches[3]];
         $first_dom = 1 + $dow - $dow_of_first;  if ( $first_dom < 1 ) $first_dom +=7;  // e.g. 1st=WE, dow=MO => 1+1-3=-1 => MO is 6th, etc.
         $whichweek = intval($matches[2]);
-        if ( $GLOBALS['debug_rrule'] ) printf( "Expanding BYDAY(M) $weekday in month of %s\n", $instance->format('c') );
+        if ( DEBUG_RRULE ) printf( "Expanding BYDAY(M) $weekday in month of %s\n", $first_of_month->format('c') );
         if ( $whichweek > 0 ) {
           $whichweek--;
           $monthday = $first_dom;
@@ -542,14 +555,14 @@ class RepeatRule {
           }
           if ( $monthday > 0 && $monthday <= $days_in_month ) {
             $expanded = $this->date_mask( clone($day_in_month), null, null, $monthday, null, null, null);
-            if ( $GLOBALS['debug_rrule'] ) printf( "Expanded BYDAY(M) $weekday now $monthday into date %s\n", $expanded->format('c') );
+            if ( DEBUG_RRULE ) printf( "Expanded BYDAY(M) $weekday now $monthday into date %s\n", $expanded->format('c') );
             $this->current_set[] = $expanded;
           }
         }
         else {
           for( $monthday = $first_dom; $monthday <= $days_in_month; $monthday += 7 ) {
             $expanded = $this->date_mask( clone($day_in_month), null, null, $monthday, null, null, null);
-            if ( $GLOBALS['debug_rrule'] ) printf( "Expanded BYDAY(M) $weekday now $monthday into date %s\n", $expanded->format('c') );
+            if ( DEBUG_RRULE ) printf( "Expanded BYDAY(M) $weekday now $monthday into date %s\n", $expanded->format('c') );
             $this->current_set[] = $expanded;
           }
         }
@@ -570,7 +583,7 @@ class RepeatRule {
         $dow = $rrule_day_numbers[$matches[3]];
         $first_doy = 1 + $dow - $dow_of_first;  if ( $first_doy < 1 ) $first_doy +=7;  // e.g. 1st=WE, dow=MO => 1+1-3=-1 => MO is 6th, etc.
         $whichweek = intval($matches[2]);
-        if ( $GLOBALS['debug_rrule'] ) printf( "Expanding BYDAY(Y) $weekday from date %s\n", $instance->format('c') );
+        if ( DEBUG_RRULE ) printf( "Expanding BYDAY(Y) $weekday from date %s\n", $instance->format('c') );
         if ( $whichweek > 0 ) {
           $whichweek--;
           $yearday = $first_doy;
@@ -584,14 +597,14 @@ class RepeatRule {
           }
           if ( $yearday > 0 && $yearday <= $days_in_year ) {
             $expanded->modify(sprintf('+%d day', $yearday - 1));
-            if ( $GLOBALS['debug_rrule'] ) printf( "Expanded BYDAY(Y) $weekday now $yearday into date %s\n", $expanded->format('c') );
+            if ( DEBUG_RRULE ) printf( "Expanded BYDAY(Y) $weekday now $yearday into date %s\n", $expanded->format('c') );
             $this->current_set[] = $expanded;
           }
         }
         else {
           $expanded->modify(sprintf('+%d day', $first_doy - 1));
           for( $yearday = $first_doy; $yearday <= $days_in_year; $yearday += 7 ) {
-            if ( $GLOBALS['debug_rrule'] ) printf( "Expanded BYDAY(Y) $weekday now $yearday into date %s\n", $expanded->format('c') );
+            if ( DEBUG_RRULE ) printf( "Expanded BYDAY(Y) $weekday now $yearday into date %s\n", $expanded->format('c') );
             $this->current_set[] = clone($expanded);
             $expanded->modify('+1 week');
           }
@@ -669,7 +682,7 @@ class RepeatRule {
     $this->current_set = array();
     foreach( $instances AS $k => $instance ) {
       foreach( $this->{$element_name} AS $k => $element_value ) {
-        if ( $GLOBALS['debug_rrule'] ) printf( "Limiting '$fmt_char' on '%s' => '%s' ?=? '%s' ? %s\n", $instance->format('c'), $instance->format($fmt_char), $element_value, ($instance->format($fmt_char) == $element_value ? 'Yes' : 'No') );
+        if ( DEBUG_RRULE ) printf( "Limiting '$fmt_char' on '%s' => '%s' ?=? '%s' ? %s\n", $instance->format('c'), $instance->format($fmt_char), $element_value, ($instance->format($fmt_char) == $element_value ? 'Yes' : 'No') );
         if ( $instance->format($fmt_char) == $element_value ) $this->current_set[] = $instance;
       }
     }
@@ -684,7 +697,7 @@ class RepeatRule {
     foreach( $this->byday AS $k => $weekday ) {
       $dow = $rrule_day_numbers[$weekday];
       foreach( $instances AS $k => $instance ) {
-        if ( $GLOBALS['debug_rrule'] ) printf( "Limiting '$fmt_char' on '%s' => '%s' ?=? '%s' (%d) ? %s\n", $instance->format('c'), $instance->format($fmt_char), $weekday, $dow, ($instance->format($fmt_char) == $dow ? 'Yes' : 'No') );
+        if ( DEBUG_RRULE ) printf( "Limiting '$fmt_char' on '%s' => '%s' ?=? '%s' (%d) ? %s\n", $instance->format('c'), $instance->format($fmt_char), $weekday, $dow, ($instance->format($fmt_char) == $dow ? 'Yes' : 'No') );
         if ( $instance->format($fmt_char) == $dow ) $this->current_set[] = $instance;
       }
     }
@@ -703,7 +716,7 @@ class RepeatRule {
     $count = count($instances);
     $this->current_set = array();
     foreach( $this->bysetpos AS $k => $element_value ) {
-      if ( $GLOBALS['debug_rrule'] ) printf( "Limiting bysetpos %s of %d instances\n", $element_value, $count );
+      if ( DEBUG_RRULE ) printf( "Limiting bysetpos %s of %d instances\n", $element_value, $count );
       if ( $element_value > 0 ) {
         $this->current_set[] = $instances[$element_value - 1];
       }
@@ -825,6 +838,7 @@ function expand_event_instances( $vResource, $range_start = null, $range_end = n
       $recur_utc = $recur_utc->UTC();
       if ( isset($range) && $range == 'THISANDFUTURE' ) {
         foreach( $instances AS $k => $v ) {
+          if ( DEBUG_RRULE ) printf( "Removing overridden instance at: $k\n" );
           if ( $k >= $recur_utc ) unset($instances[$k]);
         }
       }
@@ -832,10 +846,44 @@ function expand_event_instances( $vResource, $range_start = null, $range_end = n
         unset($instances[$recur_utc]);
       }
     }
+    else if ( DEBUG_RRULE ) {
+      $p =  $comp->GetProperty('SUMMARY');
+      $summary = ( isset($p) ? $p->Value() : 'not set');
+      $p =  $comp->GetProperty('UID');
+      $uid = ( isset($p) ? $p->Value() : 'not set');
+      printf( "Processing event '%s' with UID '%s' starting on %s\n",
+                 $summary, $uid, $dtstart->UTC() );      
+      print( "Instances at start");
+      foreach( $instances AS $k => $v ) {
+        print ' : '.$k;        
+      }
+      print "\n";
+    }
     $instances = array_merge( $instances, rrule_expand($dtstart, 'RRULE', $comp, $range_end) );
+    if ( DEBUG_RRULE ) {
+      print( "After rrule_expand");
+      foreach( $instances AS $k => $v ) {
+        print ' : '.$k;        
+      }
+      print "\n";
+    }
     $instances = array_merge( $instances, rdate_expand($dtstart, 'RDATE', $comp, $range_end) );
+    if ( DEBUG_RRULE ) {
+      print( "After rdate_expand");
+      foreach( $instances AS $k => $v ) {
+        print ' : '.$k;        
+      }
+      print "\n";
+    }
     foreach ( rdate_expand($dtstart, 'EXDATE', $comp, $range_end) AS $k => $v ) {
       unset($instances[$k]);
+    }
+    if ( DEBUG_RRULE ) {
+      print( "After exdate_expand");
+      foreach( $instances AS $k => $v ) {
+        print ' : '.$k;        
+      }
+      print "\n";
     }
   }
 
