@@ -118,7 +118,7 @@ function caldav_get_feed( $request ) {
 
       // According to karora, there are cases where we get multiple VEVENTs (overrides). I'll just stick this (1/x) notifier in here until I get to repeat event processing.
       $summary = $event_data[0]->GetProperty('SUMMARY');
-      $p_title = (isset($summary) ? $summary->Value() : 'No summary') . ' (1/' . (string)count($event_data) . ')';
+      $p_title = (isset($summary) ? $summary->Value() : translate('No summary')) . ' (1/' . (string)count($event_data) . ')';
       $is_todo ? $p_title = "TODO: " . $p_title : $p_title;
       $item->setTitle($p_title);
 
