@@ -60,6 +60,7 @@ function caldav_get_rss( $request ) {
       $sql .= 'caldav_data.collection_id = :collection_id ';
       $params = array( ':collection_id' => $collection->resource_id() );
     }
+    $c->rss_item_limit = "ALL";
     $sql .= ' ORDER BY caldav_data.modified DESC';
     $sql .= ' LIMIT '.(isset($c->rss_item_limit) ? $c->rss_item_limit : 15);
     $qry = new AwlQuery( $sql, $params );
@@ -116,7 +117,8 @@ function caldav_get_rss( $request ) {
       if ( isset($dt_modified) ) $item->setDateModified( $dt_modified->epoch() );
 
       // According to karora, there are cases where we get multiple VEVENTs (overrides). I'll just stick this (1/x) notifier in here until I get to repeat event processing.
-      $p_title = $event_data[0]->GetProperty('SUMMARY')->Value() . ' (1/' . (string)count($event_data) . ')';
+      $summary = $event_data[0]->GetProperty('SUMMARY');
+      $p_title = (isset($summary) ? $summary->Value() : 'No summary') . ' (1/' . (string)count($event_data) . ')';
       $is_todo ? $p_title = "TODO: " . $p_title : $p_title;
       $item->setTitle($p_title);
 
