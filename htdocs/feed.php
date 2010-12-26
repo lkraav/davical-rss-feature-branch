@@ -158,9 +158,8 @@ function caldav_get_feed( $request ) {
       if ( $p_description != null && $p_description->Value() != '' ) {
         $content .= '<br />'
         .'<br />'
-        .'<strong>' . translate('Description') . '</strong>:<br />' . ( nl2br($p_description->Value()) )
+        .'<strong>' . translate('Description') . '</strong>:<br />' . ( nl2br(hyperlink($p_description->Value())) )
         ;
-        if ( $p_description->Value() != '' ) $item->setDescription($p_description->Value());
       }
 
       $item->setContent($content);
