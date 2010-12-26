@@ -100,7 +100,7 @@ function caldav_get_feed( $request ) {
       $type = (count($event_data) ? $event_data[0]->GetType() : 'null'); 
 
       if ( ($type!= 'VEVENT' && $type != 'VTODO' && $type != 'VJOURNAL') ) {
-        echo "Skipping peculiar '$type' component in VCALENDAR\n";
+        dbg_error_log( 'feed', 'Skipping peculiar "%s" component in VCALENDAR', $type );
         var_dump($ical);
         continue;
       }
