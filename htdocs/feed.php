@@ -110,9 +110,18 @@ function caldav_get_feed( $request ) {
       $uid = $event_data[0]->GetProperty('UID');
       $item->setId( $c->protocol_server_port_script . ConstructURL($event->dav_name).'#'.$uid );
 
-      $dt_created = new RepeatRuleDateTime( $event_data[0]->GetProperty('CREATED') );
+      $dt_stamp = new RepeatRuleDateTime( $event_data[0]->GetProperty('DTSTAMP') );
+      if ( isset($dt_stamp) ) {
+        $item->setDateCreated( $dt_stamp->epoch() );
+        $item->setDateModified( $dt_stamp->epoch() );
+      }
+      else {
+        $dt_created = new RepeatRuleDateTime( $event_data[0]->GetProperty('CREATED') );
+        if ( isset($dt_created) ) $item->setDateCreated( $dt_created->epoch() );
+        // if we don't find a creation date from DTSTAMP or CREATED, what do we do? continue?
+      }
+
       $dt_modified = new RepeatRuleDateTime( $event_data[0]->GetProperty('LAST-MODIFIED') );
-      if ( isset($dt_created) ) $item->setDateCreated( $dt_created->epoch() );
       if ( isset($dt_modified) ) $item->setDateModified( $dt_modified->epoch() );
 
       // According to karora, there are cases where we get multiple VEVENTs (overrides). I'll just stick this (1/x) notifier in here until I get to repeat event processing.
