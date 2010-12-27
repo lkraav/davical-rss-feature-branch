@@ -18,3 +18,4 @@ TODO:
  * choose a parameter to ORDER BY (caldav_data.modified might not be the best option, perhaps calendar_item.last_modified)
  * check up on isset()'s usefulness after new re $dt_created and them
  * send whole collection on first feed pull. is there a way to differentiate when the client has freshly added the feed?
+ * handle all-day events better: 1. apr 00:00 - 2. apr 00:00 looks kinda redundant
