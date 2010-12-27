@@ -92,7 +92,16 @@ class AtomEntry {
       }
       return $author;
     }
-    throw new Exception("AtomFeed::addAuthor(\$new_value) the \$new_value MUST be an array with at leas a 'name' element. RFC4287-3.2");
+    throw new Exception("AtomFeed::addAuthor(\$new_value) the \$new_value MUST be an array with at least a 'name' element. RFC4287-3.2");
+  }
+
+  
+  public function addCategory( $new_value ) {
+    if ( is_array($new_value) && isset($new_value['term']) ) {
+      $category = $this->addNode('category', null, $new_value );
+      return $category;
+    }
+    throw new Exception("AtomFeed::addCategory(\$new_value) the \$new_value MUST be an array with at least a 'term' element, and potentially a 'scheme' and a 'label' element. RFC4287-4.2.2");
   }
 
   

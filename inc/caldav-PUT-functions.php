@@ -253,10 +253,10 @@ function handle_schedule_reply ( $ical ) {
   $resources = $ical->GetComponents('VTIMEZONE',false);
   $ic = $resources[0];
   $etag = md5 ( $request->raw_post );
-	$organizer = $ic->GetProperties('ORGANIZER');
-	// for now we treat events with out organizers as an error
-	if ( count ( $organizer ) < 1 )
-		return false;
+  $organizer = $ic->GetProperties('ORGANIZER');
+  // for now we treat events with out organizers as an error
+  if ( count ( $organizer ) < 1 ) return false;
+
   $attendees = array_merge($organizer,$ic->GetProperties('ATTENDEE'));
   $wr_attendees = $ic->GetProperties('X-WR-ATTENDEE');
   if ( count ( $wr_attendees ) > 0 ) {

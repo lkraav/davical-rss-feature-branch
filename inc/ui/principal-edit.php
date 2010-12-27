@@ -503,7 +503,7 @@ function group_row_editor() {
 
 
 function edit_group_row( $row_data ) {
-  global $id, $c, $grouprow;
+  global $id, $grouprow;
 
   $form_url = preg_replace( '#&(edit|delete)_group=\d+#', '', $_SERVER['REQUEST_URI'] );
 
@@ -606,7 +606,7 @@ function grant_row_editor() {
 
 
 function edit_grant_row( $row_data ) {
-  global $id, $c, $grantrow;
+  global $id, $grantrow;
 
   if ( $row_data->to_principal > -1 ) {
     $grantrow->Initialise( $row_data );
@@ -736,7 +736,7 @@ function ticket_row_editor() {
 
 
 function edit_ticket_row( $row_data ) {
-  global $id, $c, $ticketrow;
+  global $id, $ticketrow;
 
   if ( isset($row_data->ticket_id) ) {
     $ticketrow->Initialise( $row_data );
@@ -857,7 +857,7 @@ function confirm_delete_collection($confirmation_hash) {
 }
 
 function bindings_to_other_browser() {
-  global $page_elements, $id, $editor;
+  global $c, $page_elements, $id, $editor;
   $browser = new Browser(translate('Bindings to other collections'));
   $browser->AddColumn( 'bind_id', translate('ID'), '', '' );
   $browser->AddHidden( 'b.dav_owner_id' );
@@ -893,7 +893,7 @@ function confirm_delete_bind_in($confirmation_hash) {
   
   
 function bindings_to_us_browser() {
-  global $page_elements, $id, $editor;
+  global $c, $page_elements, $id, $editor;
   $browser = new Browser(translate('Bindings to this Principal\'s Collections'));
   $browser->AddColumn( 'bind_id', translate('ID'), '', '' );
   $browser->AddHidden( 'b.dav_owner_id' );

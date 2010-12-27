@@ -155,9 +155,13 @@ function caldav_get_feed( $request ) {
       .'<strong>' . translate('URL') . '</strong>: ' . hyperlink($p_url->Value());
 
       $p_cat = $event_data[0]->GetProperty('CATEGORIES');
-      if ( $p_cat != null )
-      $content .= '<br />'
-      .'<strong>' . translate('Categories') . '</strong>: ' . $p_cat->Value();
+      if ( $p_cat != null ) {
+        $content .= '<br />' .'<strong>' . translate('Categories') . '</strong>: ' . $p_cat->Value();
+        $categories = explode(',',$p_cat->Value());
+        foreach( $categories AS $category ) {
+          $item->addCategory( array('term' => trim($category)) );
+        }
+      }
 
       $p_description = $event_data[0]->GetProperty('DESCRIPTION');
       if ( $p_description != null && $p_description->Value() != '' ) {
@@ -165,6 +169,7 @@ function caldav_get_feed( $request ) {
         .'<br />'
         .'<strong>' . translate('Description') . '</strong>:<br />' . ( nl2br(hyperlink($p_description->Value())) )
         ;
+        $item->setDescription($p_description->Value());
       }
 
       $item->setContent($content);
