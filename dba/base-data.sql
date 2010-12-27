@@ -16,8 +16,8 @@ INSERT INTO principal_type (principal_type_id, principal_type_desc) VALUES( 3, '
 -- Create the administrator record.
 INSERT INTO usr ( user_no, active, email_ok, updated, username, password, fullname, email )
     VALUES ( 1, TRUE, current_date, current_date, 'admin', '**nimda', 'DAViCal Administrator', 'calendars@example.net' );
-INSERT INTO principal ( principal_id, type_id, user_no, displayname, default_privileges )
-    VALUES ( 1, 1, 1, 'DAViCal Administrator', 0::BIT(24) );
+INSERT INTO principal ( type_id, user_no, displayname, default_privileges )
+    VALUES ( 1, 1, 'DAViCal Administrator', 0::BIT(24) );
 
 INSERT INTO role_member (user_no, role_no) VALUES(1, 1);
 
