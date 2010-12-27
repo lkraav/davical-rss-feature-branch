@@ -45,6 +45,5 @@ else {
   $browser->RowFormat( '<tr class="r%d">', '</tr>', '#even' );
 }
 
-$browser->DoQuery();
 $page_elements[] = $browser;
 

@@ -1,5 +1,24 @@
-2010-12-25  Andrew McMillan  <andrew@morphoss.com>
+2010-12-28  Andrew McMillan  <andrew@morphoss.com>
 	* Release 0.9.9.4
+
+2010-12-27  Andrew McMillan  <andrew@morphoss.com>
+	* Refactor PUT functions to set modified/created dates more correctly.
+
+2010-12-27  Leho Kraav  <leho@kraav.com>
+	* add et_EE to support locales
+
+2010-12-26  Andrew McMillan  <andrew@morphoss.com>
+	* Fix errors in po files pointed out by Transifex uploading.
+	* A new AtomFeed class for building an Atom feed.
+	* Switch to creating an atom feed, which is a better feed standard.
+
+2010-12-26  Leho Kraav  <leho@kraav.com>
+	* A new URL to provide an RSS feed of a calendar's changes.
+
+2010-12-26  Andrew McMillan  <andrew@morphoss.com>
+	* Refactored RRule to add support for initialisation from a vProperty.
+
+2010-12-25  Andrew McMillan  <andrew@morphoss.com>
 	* Remove all reference to PgQuery
 	* Extensive refactoring of principal-edit, plus support for creating tickets.
 	* Add support for writing scheduling resources on PUT.

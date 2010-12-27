@@ -29,7 +29,7 @@
         		<!-- ========== Info from phpDoc block ========= -->
 <p class="short-description">Wrap the DateTime class to make it friendlier to passing in random strings from iCalendar  objects, and especially the random stuff used to identify timezones.  We also add some  utility methods and stuff too, in order to simplify some of the operations we need to do  with dates.</p>
 		<p class="notes">
-			Located in <a class="field" href="_inc---RRule-v2.php.html">/inc/RRule-v2.php</a> (line <span class="field">78</span>)
+			Located in <a class="field" href="_inc---RRule-v2.php.html">/inc/RRule-v2.php</a> (line <span class="field">80</span>)
 		</p>
 		
 				
@@ -79,7 +79,7 @@
 		</div>
 		<div class="info-box-body">			
 			<div class="method-summary">
-																																																																																																																																																<div class="method-definition">
+																																																																																																																																																																								<div class="method-definition">
 					<img src="../../media/images/Constructor.png" alt=" "/>
 											<span class="method-result">RepeatRuleDateTime</span>
 										<a href="#__construct" title="details" class="method-name">__construct</a>
@@ -106,7 +106,25 @@
 																<div class="method-definition">
 					<img src="../../media/images/Method.png" alt=" "/>
 											<span class="method-result">void</span>
+										<a href="#FloatOrUTC" title="details" class="method-name">FloatOrUTC</a>
+										()
+									</div>
+																<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
 										<a href="#hour" title="details" class="method-name">hour</a>
+										()
+									</div>
+																<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#isDate" title="details" class="method-name">isDate</a>
+										()
+									</div>
+																<div class="method-definition">
+					<img src="../../media/images/Method.png" alt=" "/>
+											<span class="method-result">void</span>
+										<a href="#isFloating" title="details" class="method-name">isFloating</a>
 										()
 									</div>
 																<div class="method-definition">
@@ -202,7 +220,7 @@
 		<span class="var-title">
 			static <span class="var-type">mixed</span>
 			<span class="var-name">$Format</span>
-			 = <span class="var-default"> 'c'</span>			(line <span class="line-number">80</span>)
+			 = <span class="var-default"> 'c'</span>			(line <span class="line-number">82</span>)
 		</span>
 	</div>
 
@@ -237,7 +255,7 @@
 	
 	<div class="method-header">
 		<img src="../../media/images/Constructor.png" />
-		<span class="method-title">Constructor __construct</span> (line <span class="line-number">84</span>)
+		<span class="method-title">Constructor __construct</span> (line <span class="line-number">87</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -274,7 +292,7 @@
 	
 	<div class="method-header">
 		<img src="../../media/images/Method.png" />
-		<span class="method-title">AsDate</span> (line <span class="line-number">133</span>)
+		<span class="method-title">AsDate</span> (line <span class="line-number">180</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -298,7 +316,7 @@
 	
 	<div class="method-header">
 		<img src="../../media/images/Method.png" />
-		<span class="method-title">day</span> (line <span class="line-number">217</span>)
+		<span class="method-title">day</span> (line <span class="line-number">288</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -319,7 +337,7 @@
 	
 	<div class="method-header">
 		<img src="../../media/images/Method.png" />
-		<span class="method-title">epoch</span> (line <span class="line-number">233</span>)
+		<span class="method-title">epoch</span> (line <span class="line-number">304</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -335,12 +353,36 @@
 		
 			
 	</div>
-<a name="methodhour" id="hour"><!-- --></a>
+<a name="methodFloatOrUTC" id="FloatOrUTC"><!-- --></a>
 <div class="evenrow">
 	
 	<div class="method-header">
 		<img src="../../media/images/Method.png" />
-		<span class="method-title">hour</span> (line <span class="line-number">221</span>)
+		<span class="method-title">FloatOrUTC</span> (line <span class="line-number">225</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			FloatOrUTC
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodhour" id="hour"><!-- --></a>
+<div class="oddrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">hour</span> (line <span class="line-number">292</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -356,12 +398,60 @@
 		
 			
 	</div>
-<a name="methodminute" id="minute"><!-- --></a>
+<a name="methodisDate" id="isDate"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">isDate</span> (line <span class="line-number">189</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			isDate
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodisFloating" id="isFloating"><!-- --></a>
 <div class="oddrow">
 	
 	<div class="method-header">
 		<img src="../../media/images/Method.png" />
-		<span class="method-title">minute</span> (line <span class="line-number">225</span>)
+		<span class="method-title">isFloating</span> (line <span class="line-number">185</span>)
+	</div> 
+	
+	<!-- ========== Info from phpDoc block ========= -->
+	<ul class="tags">
+				<li><span class="field">access:</span> public</li>
+			</ul>
+	
+	<div class="method-signature">
+		<span class="method-result">void</span>
+		<span class="method-name">
+			isFloating
+		</span>
+				()
+			</div>
+	
+		
+			
+	</div>
+<a name="methodminute" id="minute"><!-- --></a>
+<div class="evenrow">
+	
+	<div class="method-header">
+		<img src="../../media/images/Method.png" />
+		<span class="method-title">minute</span> (line <span class="line-number">296</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -378,11 +468,11 @@
 			
 	</div>
 <a name="methodmodify" id="modify"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div class="method-header">
 		<img src="../../media/images/Method.png" />
-		<span class="method-title">modify</span> (line <span class="line-number">138</span>)
+		<span class="method-title">modify</span> (line <span class="line-number">194</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -412,11 +502,11 @@
 			
 	</div>
 <a name="methodmonth" id="month"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div class="method-header">
 		<img src="../../media/images/Method.png" />
-		<span class="method-title">month</span> (line <span class="line-number">213</span>)
+		<span class="method-title">month</span> (line <span class="line-number">284</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -433,11 +523,11 @@
 			
 	</div>
 <a name="methodRFC5545" id="RFC5545"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div class="method-header">
 		<img src="../../media/images/Method.png" />
-		<span class="method-title">RFC5545</span> (line <span class="line-number">168</span>)
+		<span class="method-title">RFC5545</span> (line <span class="line-number">239</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -457,11 +547,11 @@
 			
 	</div>
 <a name="methodRFC5545Duration" id="RFC5545Duration"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div class="method-header">
 		<img src="../../media/images/Method.png" />
-		<span class="method-title">RFC5545Duration</span> (line <span class="line-number">186</span>)
+		<span class="method-title">RFC5545Duration</span> (line <span class="line-number">257</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -486,11 +576,11 @@
 			
 	</div>
 <a name="methodsecond" id="second"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div class="method-header">
 		<img src="../../media/images/Method.png" />
-		<span class="method-title">second</span> (line <span class="line-number">229</span>)
+		<span class="method-title">second</span> (line <span class="line-number">300</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -507,11 +597,11 @@
 			
 	</div>
 <a name="methodsetDate" id="setDate"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div class="method-header">
 		<img src="../../media/images/Method.png" />
-		<span class="method-title">setDate</span> (line <span class="line-number">201</span>)
+		<span class="method-title">setDate</span> (line <span class="line-number">272</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -544,11 +634,11 @@
 			
 	</div>
 <a name="methodsetTimeZone" id="setTimeZone"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div class="method-header">
 		<img src="../../media/images/Method.png" />
-		<span class="method-title">setTimeZone</span> (line <span class="line-number">191</span>)
+		<span class="method-title">setTimeZone</span> (line <span class="line-number">262</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -578,11 +668,11 @@
 			
 	</div>
 <a name="methodUTC" id="UTC"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div class="method-header">
 		<img src="../../media/images/Method.png" />
-		<span class="method-title">UTC</span> (line <span class="line-number">156</span>)
+		<span class="method-title">UTC</span> (line <span class="line-number">213</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -602,11 +692,11 @@
 			
 	</div>
 <a name="methodyear" id="year"><!-- --></a>
-<div class="evenrow">
+<div class="oddrow">
 	
 	<div class="method-header">
 		<img src="../../media/images/Method.png" />
-		<span class="method-title">year</span> (line <span class="line-number">209</span>)
+		<span class="method-title">year</span> (line <span class="line-number">280</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -623,11 +713,11 @@
 			
 	</div>
 <a name="method__toString" id="__toString"><!-- --></a>
-<div class="oddrow">
+<div class="evenrow">
 	
 	<div class="method-header">
 		<img src="../../media/images/Method.png" />
-		<span class="method-title">__toString</span> (line <span class="line-number">128</span>)
+		<span class="method-title">__toString</span> (line <span class="line-number">175</span>)
 	</div> 
 	
 	<!-- ========== Info from phpDoc block ========= -->
@@ -760,7 +850,7 @@
 	</div>
 	
 	<p class="notes" id="credit">
-		Documentation generated on Tue, 21 Sep 2010 12:13:35 +1200 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
+		Documentation generated on Tue, 28 Dec 2010 02:16:04 +1300 by <a href="http://www.phpdoc.org" target="_blank">phpDocumentor 1.4.3</a>
 	</p>
 	</div></body>
 </html>

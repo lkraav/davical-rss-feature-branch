@@ -4,7 +4,7 @@ davical (0.9.9.4-1) unstable; urgency=low
   * Run update-davical-database in postinst (closes: #578357)
   * Remove ancient references to rscds package.
 
- -- Andrew McMillan <awm@debian.org>  Sat, 25 Dec 2010 16:28:11 +1300
+ -- Andrew McMillan <awm@debian.org>  Tue, 28 Dec 2010 02:15:56 +1300
 
 davical (0.9.9.3-0) unstable; urgency=low
 

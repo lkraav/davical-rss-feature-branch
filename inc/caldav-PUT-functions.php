@@ -826,7 +826,7 @@ function write_resource( $user_no, $path, $caldav_data, $collection_id, $author,
 
   $dtstamp = $first->GetPValue('DTSTAMP');
   if ( !isset($dtstamp) || $dtstamp == '' ) {
-    // Strictly, this is an out of spec component, but we'll try and cope
+    // Strictly, we're dealing with an out of spec component here, but we'll try and survive
     $dtstamp = gmdate( 'Ymd\THis\Z' );
   }
   $calitem_params[':dtstamp'] = $dtstamp;

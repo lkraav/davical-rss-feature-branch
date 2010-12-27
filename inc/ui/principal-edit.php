@@ -74,7 +74,7 @@ function handle_subaction( $subaction ) {
       dbg_error_log('admin-principal-edit',':handle_action: Deleting principal %d', $id );
       if ( $session->AllowedTo('Admin') ) {
         if ( isset($id) && $id > 1 && $session->CheckConfirmationHash('GET', 'confirm') ) {
-          dbg_error_log('admin-principal-edit',':handle_action: Allowed to delete principal %d -%s', $id, $editor->Value('username') );
+          dbg_error_log('admin-principal-edit',':handle_action: Allowed to delete principal %d -%s', $id );
           $qry = new AwlQuery('DELETE FROM dav_principal WHERE principal_id=?', $id );
           if ( $qry->Exec() ) {
             $c->messages[] = i18n('Principal deleted');
