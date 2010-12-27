@@ -7,7 +7,7 @@ HEADER=User-Agent: RFC2518 Spec Tests
 HEADER=Depth: infinity
 HEADER=Content-Type: application/xml
 
-REPLACE=#<creationdate>2\d{3}-\d\d-\d\dT\d\d:\d\d:\d\d[+-]\d\d:\d\d</creationdate>#<creationdate>YYYY-MM-DDThh:mm:ss+ZZ:ZZ</creationdate>#
+# REPLACE=#<creationdate>2\d{3}-\d\d-\d\dT\d\d:\d\d:\d\d[+-]\d\d:\d\d</creationdate>#<creationdate>YYYY-MM-DDThh:mm:ss+ZZ:ZZ</creationdate>#
 
 BEGINDATA
 <?xml version="1.0" encoding="utf-8"?>

@@ -50,6 +50,7 @@ END:VCALENDAR
           dtstamp: >2007-11-24 22:09:25<
           dtstart: >2004-01-01 12:00:00<
               due: >2010-02-17 00:00:00<
+    last_modified: >2007-11-24 22:09:25<
          location: >NULL<
       logged_user: >10<
  percent_complete: >NULL<
@@ -62,5 +63,4 @@ END:VCALENDAR
               uid: >E6BC62F3-77C6-4FB7-BDD3-6882E2F1BE74<
               url: >NULL<
           user_no: >10<
-   ~ Modified Now: >1<
 

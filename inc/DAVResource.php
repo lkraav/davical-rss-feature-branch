@@ -656,15 +656,19 @@ EOQRY;
 
 
   /**
-  * Check if we have the needed privilege or send an error response.
+  * Check if we have the needed privilege or send an error response.  If the user does not have the privileges then
+  * the call will not return, and an XML error document will be output.
   *
   * @param string $privilege The name of the needed privilege.
+  * @param boolean $any Whether we accept any of the privileges. The default is true, unless the requested privilege is 'all', when it is false.
   */
   function NeedPrivilege( $privilege, $any = null ) {
     global $request;
 
+    // Do the test
     if ( $this->HavePrivilegeTo($privilege, $any) ) return;
 
+    // They failed, so output the error
     $request->NeedPrivilege( $privilege, $this->dav_name );
     exit(0);  // Unecessary, but might clarify things
   }

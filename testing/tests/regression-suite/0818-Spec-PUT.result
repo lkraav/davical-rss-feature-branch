@@ -2,7 +2,7 @@ HTTP/1.1 201 Created
 Date: Dow, 01 Jan 2000 00:00:00 GMT
 DAV: 1, 2, 3, access-control, calendar-access, calendar-schedule
 DAV: extended-mkcol, calendar-proxy, bind, addressbook
-ETag: "8600dc4a1b264a09a5f741d710497cba"
+ETag: "2a09ef8c6a9e0b6bc16228359b99d8e7"
 Content-Length: 0
 Content-Type: text/plain; charset="utf-8"
 
@@ -31,22 +31,24 @@ END:VTIMEZONE
 BEGIN:VEVENT
 DESCRIPTION:Have a microparty. All the best parties are monthly!
 UID:MICROPARTY-77C6-4FB7-BDD3-6882E2F1BE74
-DTSTAMP:20081024T220925Z
+DTSTAMP:20081027T074326Z
 SUMMARY:Woohoo!  Time to Par-tay!
 CREATED:20081024T220749Z
 DTSTART;TZID=Pacific/Auckland:20081121T160000
+DURATION:PT3H
 RRULE:FREQ=MONTHLY;INTERVAL=1;BYDAY=3FR
 END:VEVENT
 END:VCALENDAR
 <
       caldav_type: >VEVENT<
             class: >PUBLIC<
-         dav_etag: >8600dc4a1b264a09a5f741d710497cba<
+         dav_etag: >2a09ef8c6a9e0b6bc16228359b99d8e7<
       description: >Have a microparty. All the best parties are monthly!<
-            dtend: >2008-11-21 16:00:00<
-          dtstamp: >2008-10-24 22:09:25<
+            dtend: >2008-11-21 19:00:00<
+          dtstamp: >2008-10-27 07:43:26<
           dtstart: >2008-11-21 16:00:00<
               due: >NULL<
+    last_modified: >2008-10-27 07:43:26<
          location: >NULL<
       logged_user: >10<
  percent_complete: >NULL<
@@ -59,6 +61,5 @@ END:VCALENDAR
               uid: >MICROPARTY-77C6-4FB7-BDD3-6882E2F1BE74<
               url: >NULL<
           user_no: >10<
-   ~ Modified Now: >1<
-        ~Duration: >00:00:00<
+        ~Duration: >03:00:00<
 

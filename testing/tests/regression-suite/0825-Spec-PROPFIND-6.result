@@ -6,11 +6,11 @@
    <prop>
     <getcontenttype>text/calendar</getcontenttype>
     <resourcetype/>
-    <getcontentlength>302</getcontentlength>
+    <getcontentlength>313</getcontentlength>
     <displayname>Morning Mgmt Mtg</displayname>
     <getlastmodified>Dow, 01 Jan 2000 00:00:00 GMT</getlastmodified>
     <creationdate>YYYY-MM-DDThh:mm:ss+ZZ:ZZ</creationdate>
-    <getetag>"421abf7e4848d2fecbf64217ed205d4b"</getetag>
+    <getetag>"6f16959eee5c920b45548840b1e9ea19"</getetag>
     <getcontentlanguage/>
     <supportedlock>
      <lockentry>

@@ -2,7 +2,7 @@ HTTP/1.1 204 No Content
 Date: Dow, 01 Jan 2000 00:00:00 GMT
 DAV: 1, 2, 3, access-control, calendar-access, calendar-schedule
 DAV: extended-mkcol, calendar-proxy, bind, addressbook
-ETag: "5f050eca5480bbebbe9428222570913d"
+ETag: "efd0257efbc898d059c200d1391af060"
 Content-Length: 0
 Content-Type: text/plain; charset="utf-8"
 
@@ -40,7 +40,7 @@ SEQUENCE:6
 TRANSP:OPAQUE
 UID:AAA9318E-37D9-4319-8626-95ECD3D3B243
 DTSTART;TZID=Pacific/Auckland:20071125T130000
-DTSTAMP:20071123T093223Z
+DTSTAMP:20071124T224850Z
 SUMMARY:BBQ @ ML's
 CREATED:20071123T093048Z
 DTEND;TZID=Pacific/Auckland:20071125T190000
@@ -58,9 +58,10 @@ END:VCALENDAR
             class: >PUBLIC<
       description: >NULL<
             dtend: >2007-11-25 19:00:00<
-          dtstamp: >2007-11-23 09:32:23<
+          dtstamp: >2007-11-24 22:48:50<
           dtstart: >2007-11-25 13:00:00<
               due: >NULL<
+    last_modified: >2007-11-24 22:48:50<
          location: >ML's House<
       logged_user: >10<
  percent_complete: >NULL<
@@ -73,5 +74,4 @@ END:VCALENDAR
               uid: >AAA9318E-37D9-4319-8626-95ECD3D3B243<
               url: >NULL<
           user_no: >10<
-   ~ Modified Now: >1<
 

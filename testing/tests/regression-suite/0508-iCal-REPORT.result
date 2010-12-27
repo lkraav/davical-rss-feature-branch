@@ -2,7 +2,7 @@ HTTP/1.1 207 Multi-Status
 Date: Dow, 01 Jan 2000 00:00:00 GMT
 DAV: 1, 2, 3, access-control, calendar-access, calendar-schedule
 DAV: extended-mkcol, calendar-proxy, bind, addressbook
-ETag: "72e80e517b5e1c056e229b6985200b27"
+ETag: "caba91d5411c487320e8acc717f44528"
 Content-Length: 1389
 Content-Type: text/xml; charset="utf-8"
 
@@ -12,7 +12,7 @@ Content-Type: text/xml; charset="utf-8"
   <href>/caldav.php/user1/home/AAA9318E-37D9-4319-8626-95ECD3D3B243.ics</href>
   <propstat>
    <prop>
-    <getetag>"5f050eca5480bbebbe9428222570913d"</getetag>
+    <getetag>"efd0257efbc898d059c200d1391af060"</getetag>
     <C:calendar-data>BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Apple Inc.//iCal 3.0//EN
@@ -46,7 +46,7 @@ SEQUENCE:6
 TRANSP:OPAQUE
 UID:AAA9318E-37D9-4319-8626-95ECD3D3B243
 DTSTART;TZID=Pacific/Auckland:20071125T130000
-DTSTAMP:20071123T093223Z
+DTSTAMP:20071124T224850Z
 SUMMARY:BBQ @ ML's
 CREATED:20071123T093048Z
 DTEND;TZID=Pacific/Auckland:20071125T190000

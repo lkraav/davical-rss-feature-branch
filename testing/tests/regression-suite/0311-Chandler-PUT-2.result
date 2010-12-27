@@ -2,7 +2,45 @@ HTTP/1.1 201 Created
 Date: Dow, 01 Jan 2000 00:00:00 GMT
 DAV: 1, 2, 3, access-control, calendar-access, calendar-schedule
 DAV: extended-mkcol, calendar-proxy, bind, addressbook
-ETag: "421abf7e4848d2fecbf64217ed205d4b"
+ETag: "6f16959eee5c920b45548840b1e9ea19"
 Content-Length: 0
 Content-Type: text/plain; charset="utf-8"
+
+
+   A1 CalDAV DATA: >BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//PYVOBJECT//NONSGML Version 1//EN
+BEGIN:VEVENT
+UID:da81c0ee-7871-11db-c6d6-f6927c144649
+DTSTAMP:20061024T115217Z
+DTSTART:20061103T073000
+DTEND:20061103T093000
+DESCRIPTION:
+LOCATION:Olivia's
+RRULE:FREQ=MONTHLY
+STATUS:CONFIRMED
+SUMMARY:Morning Mgmt Mtg
+END:VEVENT
+END:VCALENDAR
+<
+      caldav_type: >VEVENT<
+            class: >PUBLIC<
+      description: ><
+            dtend: >2006-11-03 09:30:00<
+          dtstamp: >2006-10-24 11:52:17<
+          dtstart: >2006-11-03 07:30:00<
+              due: >NULL<
+    last_modified: >2006-10-24 11:52:17<
+         location: >Olivia's<
+      logged_user: >10<
+ percent_complete: >NULL<
+         priority: >NULL<
+            rrule: >FREQ=MONTHLY<
+           status: >CONFIRMED<
+          summary: >Morning Mgmt Mtg<
+           transp: >NULL<
+            tz_id: >NULL<
+              uid: >da81c0ee-7871-11db-c6d6-f6927c144649<
+              url: >NULL<
+          user_no: >10<
 

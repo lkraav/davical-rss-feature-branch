@@ -229,6 +229,10 @@ if ( defined(@{$queries}) && @{$queries} ) {
   foreach $sql_statement ( @$queries ) {
     # run SQL statement and dump results, into array of hashes
     my $results = $dbh->selectall_arrayref($sql_statement, { Slice => {} } );
+    if ( $dbh->err ) {
+      print $dbh->errstr, "\n";
+      next;
+    }
     foreach my $row ( @$results ) {
       print "Query result ================================================\n" if ( $debug );
       my $sep = "";
@@ -258,6 +262,10 @@ sub get_sql_value {
 
   opendb() unless defined($dbh);
   my $results = $dbh->selectall_arrayref($sql);
+  if ( $dbh->err ) {
+    print $dbh->errstr, "\n";
+    return;
+  }
   print STDERR "RESULT for $varname is ", $results->[0][0], "\n" if ( $debug );
   $values->{$varname} = (defined($results->[0][0]) ? $results->[0][0] : "");
 }

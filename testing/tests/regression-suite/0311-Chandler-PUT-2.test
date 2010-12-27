@@ -5,6 +5,36 @@ TYPE=PUT
 URL=http://mycaldav/caldav.php/user1/home/da81c0ee-7871-11db-c6d6-f6927c144649.ics
 HEADER=Content-Type: text/calendar
 HEAD
+
 #
 # More typical Chandler data, without any timezone information.
-DATA=da81c0ee-7871-11db-c6d6-f6927c144649.ics
+BEGINDATA
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//PYVOBJECT//NONSGML Version 1//EN
+BEGIN:VEVENT
+UID:da81c0ee-7871-11db-c6d6-f6927c144649
+DTSTAMP:20061024T115217Z
+DTSTART:20061103T073000
+DTEND:20061103T093000
+DESCRIPTION:
+LOCATION:Olivia's
+RRULE:FREQ=MONTHLY
+STATUS:CONFIRMED
+SUMMARY:Morning Mgmt Mtg
+END:VEVENT
+END:VCALENDAR
+ENDDATA
+
+QUERY
+SELECT caldav_data.user_no, caldav_type, logged_user, 
+       uid, dtstamp, dtstart::timestamp without time zone,
+       dtend::timestamp without time zone, due, summary, location,
+       description, priority, class, transp, rrule, url,
+       percent_complete, tz_id, status,
+       last_modified,
+       caldav_data AS "A1 CalDAV DATA"
+FROM caldav_data LEFT OUTER JOIN calendar_item USING(dav_id)
+WHERE caldav_data.dav_name = '/user1/home/da81c0ee-7871-11db-c6d6-f6927c144649.ics'
+ENDQUERY
+

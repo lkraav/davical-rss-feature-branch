@@ -753,42 +753,34 @@ function write_resource( $user_no, $path, $caldav_data, $collection_id, $author,
 
   $qry = new AwlQuery();
   $qry->Begin();
-  $params = array(
-      ':dav_name' => $path,
-      ':user_no' => $user_no,
+
+  $dav_params = array(
       ':etag' => $etag,
       ':dav_data' => $caldav_data,
       ':caldav_type' => $resource_type,
       ':session_user' => $author,
       ':weak_etag' => $weak_etag
   );
+
+  $calitem_params = array(
+      ':etag' => $etag
+  );
+
   if ( $put_action_type == 'INSERT' ) {
-    create_scheduling_requests($vcal);
-    $sql = 'INSERT INTO caldav_data ( user_no, dav_name, dav_etag, caldav_data, caldav_type, logged_user, created, modified, collection_id, weak_etag )
-            VALUES( :user_no, :dav_name, :etag, :dav_data, :caldav_type, :session_user, current_timestamp, current_timestamp, :collection_id, :weak_etag )';
-    $params[':collection_id'] = $collection_id;
+    $qry->QDo('SELECT nextval(\'dav_id_seq\') AS dav_id');
   }
   else {
-    update_scheduling_requests($vcal);
-    $sql = 'UPDATE caldav_data SET caldav_data=:dav_data, dav_etag=:etag, caldav_type=:caldav_type, logged_user=:session_user,
-            modified=current_timestamp, weak_etag=:weak_etag WHERE user_no=:user_no AND dav_name=:dav_name';
+    $qry->QDo('SELECT dav_id FROM caldav_data WHERE dav_name = :dav_name ', array(':dav_name' => $path));
   }
-  if ( !$qry->QDo($sql,$params) ) {
+  if ( $qry->rows() != 1 || !($row = $qry->Fetch()) ) {
+    // No dav_id?  => We're toast!
     rollback_on_error( $caldav_context, $user_no, $path);
     return false;
   }
-
-  $qry->QDo('SELECT dav_id FROM caldav_data WHERE dav_name = :dav_name ', array(':dav_name' => $path));
-  if ( $qry->rows() == 1 && $row = $qry->Fetch() ) {
-    $dav_id = $row->dav_id;
-  }
-
-
-  $calitem_params = array(
-      ':dav_name' => $path,
-      ':user_no' => $user_no,
-      ':etag' => $etag
-  );
+  $dav_id = $row->dav_id;
+  $dav_params[':dav_id'] = $dav_id;
+  $calitem_params[':dav_id'] = $dav_id;
+  
   $dtstart = $first->GetPValue('DTSTART');
   $calitem_params[':dtstart'] = $dtstart;
   if ( (!isset($dtstart) || $dtstart == '') && $first->GetPValue('DUE') != '' ) {
@@ -832,18 +824,21 @@ function write_resource( $user_no, $path, $caldav_data, $collection_id, $author,
     }
   }
 
-  $last_modified = $first->GetPValue('LAST-MODIFIED');
-  if ( !isset($last_modified) || $last_modified == '' ) {
-    $last_modified = gmdate( 'Ymd\THis\Z' );
-  }
-  $calitem_params[':modified'] = $last_modified;
-
   $dtstamp = $first->GetPValue('DTSTAMP');
   if ( !isset($dtstamp) || $dtstamp == '' ) {
-    $dtstamp = $last_modified;
+    // Strictly, this is an out of spec component, but we'll try and cope
+    $dtstamp = gmdate( 'Ymd\THis\Z' );
   }
   $calitem_params[':dtstamp'] = $dtstamp;
 
+  $last_modified = $first->GetPValue('LAST-MODIFIED');
+  if ( !isset($last_modified) || $last_modified == '' ) $last_modified = $dtstamp;
+  $dav_params[':modified'] = $last_modified;
+  $calitem_params[':modified'] = $last_modified;
+
+  $created = $first->GetPValue('CREATED');
+  if ( $created == '00001231T000000Z' ) $created = '20001231T000000Z';
+  
   $class = $first->GetPValue('CLASS');
   /* Check and see if we should over ride the class. */
   /** @TODO: is there some way we can move this out of this function? Or at least get rid of the need for the SQL query here. */
@@ -910,9 +905,6 @@ function write_resource( $user_no, $path, $caldav_data, $collection_id, $author,
 
   }
 
-  $created = $first->GetPValue('CREATED');
-  if ( $created == '00001231T000000Z' ) $created = '20001231T000000Z';
-  $calitem_params[':created'] = $created;
 
   $calitem_params[':tzid'] = $tzid;
   $calitem_params[':uid'] = $first->GetPValue('UID');
@@ -926,6 +918,28 @@ function write_resource( $user_no, $path, $caldav_data, $collection_id, $author,
   $calitem_params[':due'] = $first->GetPValue('DUE');
   $calitem_params[':percent_complete'] = $first->GetPValue('PERCENT-COMPLETE');
   $calitem_params[':status'] = $first->GetPValue('STATUS');
+
+  if ( !isset($dav_params[':modified']) ) $dav_params[':modified'] = 'now';
+  if ( $put_action_type == 'INSERT' ) {
+    create_scheduling_requests($vcal);
+    $sql = 'INSERT INTO caldav_data ( dav_id, user_no, dav_name, dav_etag, caldav_data, caldav_type, logged_user, created, modified, collection_id, weak_etag )
+            VALUES( :dav_id, :user_no, :dav_name, :etag, :dav_data, :caldav_type, :session_user, :created, :modified, :collection_id, :weak_etag )';
+    $dav_params[':collection_id'] = $collection_id;
+    $dav_params[':user_no'] = $user_no;
+    $dav_params[':dav_name'] = $path;
+    $dav_params[':created'] = (isset($created) && $created != '' ? $created : $dtstamp);
+  }
+  else {
+    update_scheduling_requests($vcal);
+    $sql = 'UPDATE caldav_data SET caldav_data=:dav_data, dav_etag=:etag, caldav_type=:caldav_type, logged_user=:session_user,
+            modified=:modified, weak_etag=:weak_etag WHERE dav_id=:dav_id';
+  }
+  if ( !$qry->QDo($sql,$dav_params) ) {
+    rollback_on_error( $caldav_context, $user_no, $path);
+    return false;
+  }
+
+  
   if ( $put_action_type == 'INSERT' ) {
     $sql = <<<EOSQL
 INSERT INTO calendar_item (user_no, dav_name, dav_id, dav_etag, uid, dtstamp,
@@ -935,17 +949,21 @@ INSERT INTO calendar_item (user_no, dav_name, dav_id, dav_etag, uid, dtstamp,
    VALUES ( :user_no, :dav_name, currval('dav_id_seq'), :etag, :uid, :dtstamp,
                 :dtstart, $dtend, :summary, :location, :class, :transp,
                 :description, :rrule, :tzid, :modified, :url, :priority,
-                :created, :due, :percent_complete, :status, $collection_id )
+                :created, :due, :percent_complete, :status, :collection_id )
 EOSQL;
     $sync_change = 201;
+    $calitem_params[':collection_id'] = $collection_id;
+    $calitem_params[':user_no'] = $user_no;
+    $calitem_params[':dav_name'] = $path;
+    $calitem_params[':created'] = $dav_params[':created'];
   }
   else {
     $sql = <<<EOSQL
 UPDATE calendar_item SET dav_etag=:etag, uid=:uid, dtstamp=:dtstamp,
                 dtstart=:dtstart, dtend=$dtend, summary=:summary, location=:location, class=:class, transp=:transp,
                 description=:description, rrule=:rrule, tz_id=:tzid, last_modified=:modified, url=:url, priority=:priority,
-                created=:created, due=:due, percent_complete=:percent_complete, status=:status
-       WHERE user_no=:user_no AND dav_name=:dav_name
+                due=:due, percent_complete=:percent_complete, status=:status
+       WHERE dav_id=:dav_id
 EOSQL;
     $sync_change = 200;
   }

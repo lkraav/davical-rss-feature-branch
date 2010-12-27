@@ -2,7 +2,7 @@ HTTP/1.1 204 No Content
 Date: Dow, 01 Jan 2000 00:00:00 GMT
 DAV: 1, 2, 3, access-control, calendar-access, calendar-schedule
 DAV: extended-mkcol, calendar-proxy, bind, addressbook
-ETag: "557e551fae1b5c7f2131bde1ba0ba01e"
+ETag: "6cff373f55c3e8318ad1c0db93205d08"
 Content-Length: 0
 Content-Type: text/plain; charset="utf-8"
 
@@ -32,7 +32,7 @@ TZOFFSETTO:+1200
 END:STANDARD
 END:VTIMEZONE
 BEGIN:VEVENT
-DTSTAMP:20061025T101327Z
+DTSTAMP:20061107T031419Z
 DTSTART;TZID=New Zealand Standard Time:20061025T091500
 DURATION:PT1H
 SUMMARY:A first event, modified.
@@ -44,9 +44,10 @@ END:VCALENDAR
             class: >PUBLIC<
       description: >NULL<
             dtend: >2006-10-25 10:15:00<
-          dtstamp: >2006-10-25 10:13:27<
+          dtstamp: >2006-11-07 03:14:19<
           dtstart: >2006-10-25 09:15:00<
               due: >NULL<
+    last_modified: >2006-11-07 03:14:19<
          location: >NULL<
       logged_user: >10<
  percent_complete: >NULL<
@@ -59,5 +60,4 @@ END:VCALENDAR
               uid: >B18CBB57295D01D7661A6DD4@D76FAF7B10D9E8D2D41F779C<
               url: >NULL<
           user_no: >10<
-   ~ Modified Now: >1<
 

@@ -9,7 +9,6 @@ HEAD
 
 QUERY
 SELECT caldav_data.dav_name AS data_name, calendar_item.dav_name AS item_name,
-       (modified > (current_timestamp - '1 hour'::interval)) AS mod_in_last_hour,
        caldav_data.user_no AS cd_user_no,
        calendar_item.user_no AS ci_user_no,
        caldav_data.collection_id AS cd_collection,

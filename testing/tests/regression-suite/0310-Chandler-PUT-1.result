@@ -2,7 +2,62 @@ HTTP/1.1 201 Created
 Date: Dow, 01 Jan 2000 00:00:00 GMT
 DAV: 1, 2, 3, access-control, calendar-access, calendar-schedule
 DAV: extended-mkcol, calendar-proxy, bind, addressbook
-ETag: "0d7a68984bf525342d22b8924a57e8e2"
+ETag: "55f02f66966ee150320383803d1e0d34"
 Content-Length: 0
 Content-Type: text/plain; charset="utf-8"
+
+
+   A1 CalDAV DATA: >BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//PYVOBJECT//NONSGML Version 1//EN
+BEGIN:VTIMEZONE
+TZID:Pacific/Auckland
+BEGIN:STANDARD
+DTSTART:20000319T030000
+RRULE:FREQ=YEARLY;BYDAY=3SU;BYMONTH=3
+TZNAME:Pacific/Auckland
+TZOFFSETFROM:+1300
+TZOFFSETTO:+1200
+END:STANDARD
+BEGIN:DAYLIGHT
+DTSTART:20001001T020000
+RRULE:FREQ=YEARLY;BYDAY=1SU;BYMONTH=10
+TZNAME:Pacific/Auckland
+TZOFFSETFROM:+1200
+TZOFFSETTO:+1300
+END:DAYLIGHT
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:71e2ae82-7870-11db-c6d6-f6927c144649
+DTSTAMP:20060511T043751Z
+DTSTART;TZID=Pacific/Auckland:20061103T160000
+DTEND;TZID=Pacific/Auckland:20061103T174500
+DESCRIPTION:
+LOCATION:Level 3
+RRULE:FREQ=WEEKLY;INTERVAL=2;UNTIL=20071222T235900
+STATUS:CONFIRMED
+SUMMARY:Beer O'Clock
+END:VEVENT
+END:VCALENDAR
+<
+      caldav_type: >VEVENT<
+            class: >PUBLIC<
+      description: ><
+            dtend: >2006-11-03 17:45:00<
+          dtstamp: >2006-05-11 04:37:51<
+          dtstart: >2006-11-03 16:00:00<
+              due: >NULL<
+    last_modified: >2006-05-11 04:37:51<
+         location: >Level 3<
+      logged_user: >10<
+ percent_complete: >NULL<
+         priority: >NULL<
+            rrule: >FREQ=WEEKLY;INTERVAL=2;UNTIL=20071222T235900<
+           status: >CONFIRMED<
+          summary: >Beer O'Clock<
+           transp: >NULL<
+            tz_id: >Pacific/Auckland<
+              uid: >71e2ae82-7870-11db-c6d6-f6927c144649<
+              url: >NULL<
+          user_no: >10<
 

@@ -32,7 +32,7 @@ function caldav_get_feed( $request ) {
   require_once("DAVResource.php");
 
   $collection = new DAVResource($request->path);
-  $collection->NeedPrivilege( array('urn:ietf:params:xml:ns:caldav:read-free-busy','DAV::read') );
+  $collection->NeedPrivilege( array('DAV::read') );
 
   if ( ! $collection->Exists() ) {
     $request->DoResponse( 404, translate("Resource Not Found.") );
@@ -49,18 +49,20 @@ function caldav_get_feed( $request ) {
      * The CalDAV specification does not define GET on a collection, but typically this is
      * used as a .ics download for the whole collection, which is what we do also.
      */
-    $sql = 'SELECT caldav_data, class, caldav_type, calendar_item.user_no, caldav_data.dav_name ';
-    $sql .= 'FROM collection INNER JOIN caldav_data USING(collection_id) INNER JOIN calendar_item USING ( dav_id ) WHERE ';
+    $sql = 'SELECT caldav_data, caldav_type, caldav_data.user_no, caldav_data.dav_name,';
+    $sql .= ' caldav_data.modified, caldav_data.created, ';
+    $sql .= ' summary, dtstart, dtend, calendar_item.description ';
+    $sql .= ' FROM collection INNER JOIN caldav_data USING(collection_id) INNER JOIN calendar_item USING ( dav_id ) WHERE ';
     if ( isset($c->get_includes_subcollections) && $c->get_includes_subcollections ) {
-      $sql .= '(collection.dav_name ~ :path_match ';
-      $sql .= 'OR collection.collection_id IN (SELECT bound_source_id FROM dav_binding WHERE dav_binding.dav_name ~ :path_match)) ';
+      $sql .= ' (collection.dav_name ~ :path_match ';
+      $sql .= ' OR collection.collection_id IN (SELECT bound_source_id FROM dav_binding WHERE dav_binding.dav_name ~ :path_match)) ';
       $params = array( ':path_match' => '^'.$request->path );
     }
     else {
-      $sql .= 'caldav_data.collection_id = :collection_id ';
+      $sql .= ' caldav_data.collection_id = :collection_id ';
       $params = array( ':collection_id' => $collection->resource_id() );
     }
-    $sql .= ' ORDER BY caldav_data.modified DESC';
+    $sql .= ' ORDER BY caldav_data.created DESC';
     $sql .= ' LIMIT '.(isset($c->feed_item_limit) ? $c->feed_item_limit : 15);
     $qry = new AwlQuery( $sql, $params );
     if ( !$qry->Exec("GET",__LINE__,__FILE__) ) {
@@ -75,7 +77,7 @@ function caldav_get_feed( $request ) {
     require_once('AtomFeed.php');
     $feed = new AtomFeed();
 
-    $feed->setTitle('CalDAV Feed: '. $collection->GetProperty('displayname'));
+    $feed->setTitle('DAViCal Atom Feed: '. $collection->GetProperty('displayname'));
     $url = $c->protocol_server_port . $collection->url();
     $url = preg_replace( '{/$}', '.ics', $url);
     $feed->setLink($url);
@@ -93,53 +95,37 @@ function caldav_get_feed( $request ) {
     $need_zones = array();
     $timezones = array();
     while( $event = $qry->Fetch() ) {
-      $ical = new vComponent( $event->caldav_data );
-      if ( $ical->GetType() != 'VCALENDAR' ) continue;
-
-      $event_data = $ical->GetComponents('VTIMEZONE', false);
-      $type = (count($event_data) ? $event_data[0]->GetType() : 'null'); 
-
-      if ( ($type!= 'VEVENT' && $type != 'VTODO' && $type != 'VJOURNAL') ) {
-        dbg_error_log( 'feed', 'Skipping peculiar "%s" component in VCALENDAR', $type );
-        var_dump($ical);
+      if ( $event->caldav_type != 'VEVENT' && $event->caldav_type != 'VTODO' && $event->caldav_type != 'VJOURNAL') {
+        dbg_error_log( 'feed', 'Skipping peculiar "%s" component in VCALENDAR', $event->caldav_type );
         continue;
       }
-      $is_todo = ($event_data[0]->GetType() == 'VTODO');
+      $is_todo = ($event->caldav_type == 'VTODO');
+
+      $ical = new vComponent( $event->caldav_data );
+      $event_data = $ical->GetComponents('VTIMEZONE', false);
       
       $item = $feed->createEntry();
-      $uid = $event_data[0]->GetProperty('UID');
-      $item->setId( $c->protocol_server_port_script . ConstructURL($event->dav_name).'#'.$uid );
+      $item->setId( $c->protocol_server_port_script . ConstructURL($event->dav_name) );
 
-      $dt_stamp = new RepeatRuleDateTime( $event_data[0]->GetProperty('DTSTAMP') );
-      if ( isset($dt_stamp) ) {
-        $item->setDateCreated( $dt_stamp->epoch() );
-        $item->setDateModified( $dt_stamp->epoch() );
-      }
-      else {
-        $dt_created = new RepeatRuleDateTime( $event_data[0]->GetProperty('CREATED') );
-        if ( isset($dt_created) ) $item->setDateCreated( $dt_created->epoch() );
-        // if we don't find a creation date from DTSTAMP or CREATED, what do we do? continue?
-      }
+      $dt_created = new RepeatRuleDateTime( $event->created );
+      $item->setDateCreated( $dt_created->epoch() );
 
-      $dt_modified = new RepeatRuleDateTime( $event_data[0]->GetProperty('LAST-MODIFIED') );
-      if ( isset($dt_modified) ) $item->setDateModified( $dt_modified->epoch() );
+      $dt_modified = new RepeatRuleDateTime( $event->modified );
+      $item->setDateModified( $dt_modified->epoch() );
 
-      // According to karora, there are cases where we get multiple VEVENTs (overrides). I'll just stick this (1/x) notifier in here until I get to repeat event processing.
-      $summary = $event_data[0]->GetProperty('SUMMARY');
-      $p_title = (isset($summary) ? $summary->Value() : translate('No summary')) . ' (1/' . (string)count($event_data) . ')';
-      $is_todo ? $p_title = "TODO: " . $p_title : $p_title;
+      $summary = $event->summary;
+      $p_title = ($summary != '' ? $summary : translate('No summary'));
+      if ( $is_todo ) $p_title = "TODO: " . $p_title;
       $item->setTitle($p_title);
 
       $content = "";
 
-      $dt_start = $event_data[0]->GetProperty('DTSTART');
+      $dt_start = new RepeatRuleDateTime($event->dtstart);
       if  ( $dt_start != null ) {
-        $dt_start = new RepeatRuleDateTime($dt_start);
         $p_time = '<strong>' . translate('Time') . ':</strong> ' . strftime(translate('%F %T'), $dt_start->epoch());
 
-        $dt_end = $event_data[0]->GetProperty('DTEND');
+        $dt_end = new RepeatRuleDateTime($event->dtend);
         if  ( $dt_end != null ) {
-          $dt_end = new RepeatRuleDateTime($dt_end);
           $p_time .= ' - ' . ( $dt_end->AsDate() == $dt_start->AsDate()
                                    ? strftime(translate('%T'), $dt_end->epoch())
                                    : strftime(translate('%F %T'), $dt_end->epoch())
@@ -172,20 +158,21 @@ function caldav_get_feed( $request ) {
         }
       }
 
-      $p_description = $event_data[0]->GetProperty('DESCRIPTION');
-      if ( $p_description != null && $p_description->Value() != '' ) {
+      $p_description = $event->description;
+      if ( $p_description != '' ) {
         $content .= '<br />'
         .'<br />'
-        .'<strong>' . translate('Description') . '</strong>:<br />' . ( nl2br(hyperlink($p_description->Value())) )
+        .'<strong>' . translate('Description') . '</strong>:<br />' . ( nl2br(hyperlink($p_description)) )
         ;
-        $item->setDescription($p_description->Value());
+        $item->setDescription($p_description);
       }
 
       $item->setContent($content);
       $feed->addEntry($item);
       //break;
     }
-    $feed->setDateModified(time());
+    $last_modified = new RepeatRuleDateTime($collection->GetProperty('modified'));
+    $feed->setDateModified($last_modified->epoch());
     $response = $feed->export('atom');
     header( 'Content-Length: '.strlen($response) );
     header( 'Etag: '.$collection->unique_tag() );

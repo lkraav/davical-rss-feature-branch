@@ -45,6 +45,7 @@ END:VCALENDAR
           dtstamp: >2009-05-15 09:53:26<
           dtstart: >2006-01-01 00:00:00<
               due: >NULL<
+    last_modified: >2009-05-15 09:53:26<
          location: >NULL<
       logged_user: >10<
  percent_complete: >NULL<
@@ -57,5 +58,4 @@ END:VCALENDAR
               uid: >C68DADAD-37CE-44F7-8A37-52E1D02E29CA<
               url: >NULL<
           user_no: >10<
-   ~ Modified Now: >1<
 

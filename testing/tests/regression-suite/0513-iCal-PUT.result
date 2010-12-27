@@ -2,7 +2,7 @@ HTTP/1.1 204 No Content
 Date: Dow, 01 Jan 2000 00:00:00 GMT
 DAV: 1, 2, 3, access-control, calendar-access, calendar-schedule
 DAV: extended-mkcol, calendar-proxy, bind, addressbook
-ETag: "087d1ea4915719b8a904ca18a9abbbe1"
+ETag: "6079c141bc189326bf2432a8426c4242"
 Content-Length: 0
 Content-Type: text/plain; charset="utf-8"
 
@@ -40,7 +40,7 @@ SEQUENCE:5
 TRANSP:OPAQUE
 UID:6C8A0D88-E1F9-4FC1-9EDD-DA258ABF2CFA
 DTSTART;TZID=Pacific/Auckland:20071126T070000
-DTSTAMP:20071124T083810Z
+DTSTAMP:20071124T084239Z
 SUMMARY:Go to work
 CREATED:20071124T083709Z
 DTEND;TZID=Pacific/Auckland:20071126T170000
@@ -56,12 +56,13 @@ END:VCALENDAR
 <
       caldav_type: >VEVENT<
             class: >PUBLIC<
-         dav_etag: >087d1ea4915719b8a904ca18a9abbbe1<
+         dav_etag: >6079c141bc189326bf2432a8426c4242<
       description: >NULL<
             dtend: >2007-11-26 17:00:00<
-          dtstamp: >2007-11-24 08:38:10<
+          dtstamp: >2007-11-24 08:42:39<
           dtstart: >2007-11-26 07:00:00<
               due: >NULL<
+    last_modified: >2007-11-24 08:42:39<
          location: >NULL<
       logged_user: >10<
  percent_complete: >NULL<
@@ -74,5 +75,4 @@ END:VCALENDAR
               uid: >6C8A0D88-E1F9-4FC1-9EDD-DA258ABF2CFA<
               url: >NULL<
           user_no: >10<
-   ~ Modified Now: >1<
 

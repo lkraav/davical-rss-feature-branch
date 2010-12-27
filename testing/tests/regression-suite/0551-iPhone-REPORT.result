@@ -2,8 +2,8 @@ HTTP/1.1 207 Multi-Status
 Date: Dow, 01 Jan 2000 00:00:00 GMT
 DAV: 1, 2, 3, access-control, calendar-access, calendar-schedule
 DAV: extended-mkcol, calendar-proxy, bind, addressbook
-ETag: "2e7702d874d6a53c957bf59a6220d2c9"
-Content-Length: 4411
+ETag: "d991e899426181952a974530d490423f"
+Content-Length: 4448
 Content-Type: text/xml; charset="utf-8"
 
 <?xml version="1.0" encoding="utf-8" ?>
@@ -63,7 +63,7 @@ END:VCALENDAR
   <href>/caldav.php/user1/home/71e2ae82-7870-11db-c6d6-f6927c144649.ics</href>
   <propstat>
    <prop>
-    <getetag>"0d7a68984bf525342d22b8924a57e8e2"</getetag>
+    <getetag>"55f02f66966ee150320383803d1e0d34"</getetag>
     <C:calendar-data>BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//PYVOBJECT//NONSGML Version 1//EN
@@ -86,6 +86,7 @@ END:DAYLIGHT
 END:VTIMEZONE
 BEGIN:VEVENT
 UID:71e2ae82-7870-11db-c6d6-f6927c144649
+DTSTAMP:20060511T043751Z
 DTSTART;TZID=Pacific/Auckland:20061103T160000
 DTEND;TZID=Pacific/Auckland:20061103T174500
 DESCRIPTION:
@@ -104,12 +105,13 @@ END:VCALENDAR
   <href>/caldav.php/user1/home/da81c0ee-7871-11db-c6d6-f6927c144649.ics</href>
   <propstat>
    <prop>
-    <getetag>"421abf7e4848d2fecbf64217ed205d4b"</getetag>
+    <getetag>"6f16959eee5c920b45548840b1e9ea19"</getetag>
     <C:calendar-data>BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//PYVOBJECT//NONSGML Version 1//EN
 BEGIN:VEVENT
 UID:da81c0ee-7871-11db-c6d6-f6927c144649
+DTSTAMP:20061024T115217Z
 DTSTART:20061103T073000
 DTEND:20061103T093000
 DESCRIPTION:
@@ -128,7 +130,7 @@ END:VCALENDAR
   <href>/caldav.php/user1/home/AAA9318E-37D9-4319-8626-95ECD3D3B243.ics</href>
   <propstat>
    <prop>
-    <getetag>"5f050eca5480bbebbe9428222570913d"</getetag>
+    <getetag>"efd0257efbc898d059c200d1391af060"</getetag>
     <C:calendar-data>BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Apple Inc.//iCal 3.0//EN
@@ -162,7 +164,7 @@ SEQUENCE:6
 TRANSP:OPAQUE
 UID:AAA9318E-37D9-4319-8626-95ECD3D3B243
 DTSTART;TZID=Pacific/Auckland:20071125T130000
-DTSTAMP:20071123T093223Z
+DTSTAMP:20071124T224850Z
 SUMMARY:BBQ @ ML's
 CREATED:20071123T093048Z
 DTEND;TZID=Pacific/Auckland:20071125T190000

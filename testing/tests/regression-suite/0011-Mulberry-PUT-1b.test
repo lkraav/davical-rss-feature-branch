@@ -32,7 +32,7 @@ TZOFFSETTO:+1200
 END:STANDARD
 END:VTIMEZONE
 BEGIN:VEVENT
-DTSTAMP:20061025T101327Z
+DTSTAMP:20061107T031419Z
 DTSTART;TZID=New Zealand Standard Time:20061025T091500
 DURATION:PT1H
 SUMMARY:A first event, modified.
@@ -50,7 +50,7 @@ SELECT caldav_data.user_no, caldav_type, logged_user, uid,
        due, summary, location,
        description, priority, class, transp, rrule, url,
        percent_complete, tz_id, status,
-       ((current_timestamp AT TIME ZONE 'GMT' - last_modified) < '2 seconds'::interval) AS "~ Modified Now",
+       last_modified,
        caldav_data AS "A1 CalDAV DATA"
 FROM caldav_data JOIN calendar_item USING(dav_name) JOIN time_zone USING (tz_id)
 WHERE caldav_data.dav_name ~ '^/user1/home/'

@@ -43,11 +43,11 @@ ENDDATA
 
 QUERY
 SELECT caldav_data.user_no, caldav_data.dav_etag, caldav_type, logged_user, 
-       uid, dtstamp, dtstart at time zone tz_locn as dtstart, dtend at time zone tz_locn as dtend, due, summary, location,
+       uid, dtstamp, dtstart at time zone tz_locn as dtstart,
+       dtend at time zone tz_locn as dtend, due, summary, location,
        description, priority, class, transp, rrule, url,
        percent_complete, tz_id, status,
-       caldav_data AS " CalDAV Data",
-      ((current_timestamp AT TIME ZONE 'GMT' - last_modified) < '2 seconds'::interval) AS "~ Modified Now"
+       caldav_data AS " CalDAV Data", last_modified
 FROM caldav_data JOIN calendar_item USING(dav_name) LEFT JOIN time_zone USING (tz_id)
 WHERE caldav_data.dav_name =
 '/user1/collection/All_Day_NY_JAN1.ics'
